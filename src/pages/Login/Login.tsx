@@ -3,6 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginFormFields, validationSchema } from "./LoginSchema";
 import { Button } from "../../components";
 import { Link } from "react-router-dom";
+import { ROUTES } from "../../config/constants";
 
 function Login() {
   const {
@@ -26,30 +27,30 @@ function Login() {
             <div className="mb-2">
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
-                placeholder="username"
-                {...register("username")}
+                placeholder="Username"
+                {...register("Username")}
               />
-              <p className="text-red-500">{errors.username?.message}</p>
+              <p className="text-red-500">{errors.Username?.message}</p>
             </div>
 
             <div className="mb-7">
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
-                placeholder="password"
+                placeholder="Password"
                 type="password"
-                {...register("password")}
+                {...register("Password")}
               />
-              <p className="text-red-500">{errors.password?.message}</p>
+              <p className="text-red-500">{errors.Password?.message}</p>
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button text="Login" color="gray" />
+              <Button children="Login" color="black" />
             </div>
           </form>
           <div className="flex flex-col justify-center items-center lg:border-l-2 lg:pl-5">
             <p className="mb-3">Don't have an account?</p>
-            <Link to="/signup">
-              <Button text="Create a new account" color="white" />
+            <Link to={ROUTES.SIGNUP}>
+              <Button children="Create a new account" color="white" />
             </Link>
           </div>
         </div>

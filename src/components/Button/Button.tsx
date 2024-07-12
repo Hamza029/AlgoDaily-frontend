@@ -1,14 +1,10 @@
-interface ButtonProps {
-  text: string;
-  handleClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  color: "gray" | "white";
-}
+import ButtonProps from "./ButtonProps";
 
-function Button({ text, handleClick = () => {}, color }: ButtonProps) {
-  const textColor = color === "gray" ? "text-white" : "text-gray-800";
-  const buttonColor = color === "gray" ? "bg-gray-800" : "bg-gray-200";
+function Button({ children, handleClick = () => {}, color }: ButtonProps) {
+  const textColor = color === "black" ? "text-white" : "text-gray-800";
+  const buttonColor = color === "black" ? "bg-gray-800" : "bg-gray-200";
   const buttonColorHover =
-    color === "gray" ? "hover:bg-gray-700" : "hover:bg-gray-300";
+    color === "black" ? "hover:bg-gray-700" : "hover:bg-gray-300";
 
   return (
     <>
@@ -17,7 +13,7 @@ function Button({ text, handleClick = () => {}, color }: ButtonProps) {
         onClick={handleClick}
         type="submit"
       >
-        {text}
+        {children}
       </button>
     </>
   );

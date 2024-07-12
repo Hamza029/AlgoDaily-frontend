@@ -4,7 +4,7 @@ import { Footer, Navbar } from "./../../components";
 export default function Layout() {
   return (
     <div className="relative min-h-screen">
-      <Navbar isAuthPage={false} />
+      <Navbar isAuthPage={true} />
       <div>
         <Outlet />
       </div>
