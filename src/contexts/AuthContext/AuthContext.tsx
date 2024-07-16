@@ -1,0 +1,45 @@
+import { createContext, useEffect, useState } from "react";
+import AuthContextType from "./AuthContextType";
+import { checkIfTokenValid, getUserIdFromToken } from "../../helpers/utils";
+
+export const AuthContext = createContext<AuthContextType>({
+  checkLoggedIn: () => null,
+  currentUserId: null,
+  setToken: (_prev) => null,
+});
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token"),
+  );
+
+  const [currentUserId, setCurrentUserId] = useState(getUserIdFromToken(token));
+
+  // if someone manually modifies the token from browser
+  useEffect(() => {
+    window.addEventListener("storage", (_e) => {
+      console.log("--storage modified manually--");
+      setToken(() => localStorage.getItem("token"));
+    });
+  }, []);
+
+  // if token is modified then change currentUserId
+  useEffect(() => {
+    localStorage.setItem("token", token!);
+    setCurrentUserId(() => getUserIdFromToken(token));
+  }, [token]);
+
+  // check if logged in, but only when the token changes (for optimization)
+  const checkLoggedIn = () => {
+    if (checkIfTokenValid(token)) {
+      return true;
+    }
+    return false;
+  };
+
+  return (
+    <AuthContext.Provider value={{ currentUserId, checkLoggedIn, setToken }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}

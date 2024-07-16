@@ -2,8 +2,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { SignupFormFields, validationSchema } from "./SignupSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
-import { Button } from "../../components";
+import { Button, Toast } from "../../components";
 import { ROUTES } from "../../config/constants";
+import authAPI from "../../api/authAPI";
+import { AppError } from "../../helpers/AppError";
+import { useState } from "react";
 
 function Signup() {
   const {
@@ -12,10 +15,37 @@ function Signup() {
     formState: { errors },
   } = useForm<SignupFormFields>({ resolver: yupResolver(validationSchema) });
 
-  const onSubmit: SubmitHandler<SignupFormFields> = (data) => console.log(data);
+  const [signupError, setSignupError] = useState<string | null>(null);
+  const [singupSuccessful, setSignupSuccessful] = useState<string | null>(null);
+
+  const onSubmit: SubmitHandler<SignupFormFields> = async (data) => {
+    try {
+      const res = await authAPI.signup(data);
+      setSignupSuccessful(() => res.message);
+    } catch (err) {
+      const appError = err as AppError;
+      setSignupError(() => appError.message);
+    }
+  };
 
   return (
     <>
+      {signupError && (
+        <Toast
+          message={signupError}
+          severity="error"
+          handleToastClose={() => setSignupError(null)}
+        />
+      )}
+
+      {singupSuccessful && (
+        <Toast
+          message={singupSuccessful}
+          severity="success"
+          handleToastClose={() => setSignupSuccessful(null)}
+        />
+      )}
+
       <p className="text-center mt-14 text-4xl font-bold text-gray-700">
         Create a new account!
       </p>
