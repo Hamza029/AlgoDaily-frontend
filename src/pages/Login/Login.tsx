@@ -1,13 +1,14 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginFormFields, validationSchema } from "./LoginSchema";
-import { Button } from "../../components";
+import { Button, Toast } from "../../components";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../config/constants";
 import authAPI from "../../api/authAPI";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { Navigate } from "react-router-dom";
+import { AppError } from "../../helpers/AppError";
 
 function Login() {
   const {
@@ -19,19 +20,33 @@ function Login() {
   });
 
   const { checkLoggedIn, setToken } = useContext(AuthContext);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const onSubmit: SubmitHandler<LoginFormFields> = async (data) => {
-    const res = await authAPI.login(data);
-    console.log(res);
-    if (res.status === 200) {
-      const newToken = res.data!.token;
+    try {
+      const res = await authAPI.login(data);
+      const newToken = res.data.token;
       setToken(() => newToken);
+    } catch (err) {
+      const appError = err as AppError;
+      setLoginError(() => appError.message);
     }
+  };
+
+  const handleToastClose = () => {
+    setLoginError(null);
   };
 
   return (
     <>
       {checkLoggedIn() && <Navigate to="/" replace={true} />}
+      {loginError && (
+        <Toast
+          message={loginError}
+          severity="error"
+          handleToastClose={handleToastClose}
+        />
+      )}
       <p className="text-center mt-14 text-4xl font-bold text-gray-700">
         Login
       </p>

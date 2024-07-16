@@ -2,7 +2,6 @@ import { jwtDecode } from "jwt-decode";
 import JWTPayload from "../shared/types/jwtPayload";
 import { AxiosResponse, AxiosError } from "axios";
 import APIResponse from "../shared/types/apiRespose";
-import LoginResponse from "../shared/types/loginResponse";
 
 export const getUserIdFromToken = (authToken: string | null): string | null => {
   if (!authToken || authToken === "") {
@@ -25,7 +24,6 @@ export const checkIfTokenValid = (token: string | null): boolean => {
   try {
     const payload: JWTPayload = jwtDecode(token) as JWTPayload;
     const currentTime = Date.now() / 1000;
-    console.log(currentTime, payload.exp);
     if (currentTime <= payload.exp) {
       return true;
     }
@@ -36,10 +34,10 @@ export const checkIfTokenValid = (token: string | null): boolean => {
   return false;
 };
 
-export const parseResponse = (res: AxiosResponse) => {
+export const parseResponse = <T>(res: AxiosResponse) => {
   const { data, status } = res;
 
-  const response: APIResponse<LoginResponse> = {
+  const response: APIResponse<T> = {
     status,
     message: data.message,
     data: data.data,
@@ -54,6 +52,7 @@ export const parseError = (err: AxiosError) => {
     message: err.response?.data
       ? (err.response.data as APIResponse<null>).message
       : "something went wrong",
+    data: null,
   };
 
   return errResponse;
