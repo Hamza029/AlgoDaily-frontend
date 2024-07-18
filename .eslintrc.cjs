@@ -19,5 +19,11 @@ module.exports = {
       1,
       { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
     ],
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "auto",
+      },
+    ],
   },
 };
