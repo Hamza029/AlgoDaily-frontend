@@ -18,11 +18,11 @@ const dropIn = {
   },
 };
 
-function Modal({ handleClose }: ModalProps) {
+function Modal({ children, handleClose }: ModalProps) {
   return (
     <Backdrop onClick={handleClose}>
       <motion.div
-        className=" w-[90%] md:w-[600px] h-96 bg-white z-50 rounded-lg"
+        className="bg-white rounded-lg"
         onClick={(e) => e.stopPropagation()}
         variants={dropIn}
         initial="hidden"
@@ -35,21 +35,7 @@ function Modal({ handleClose }: ModalProps) {
         >
           <IconXboxXFilled />
         </button>
-        <form action="" className="w[90%] px-10 py-10 text-lg">
-          <div>
-            <input
-              type="text"
-              className="border-2 border-gray-800 w-full rounded-lg mb-3 p-2"
-              placeholder="Title..."
-            />
-          </div>
-          <div>
-            <textarea
-              className="border-2 border-gray-800 resize-none w-full rounded-lg h-60 p-2"
-              placeholder="Description..."
-            />
-          </div>
-        </form>
+        {children}
       </motion.div>
     </Backdrop>
   );

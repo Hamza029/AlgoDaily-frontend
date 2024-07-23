@@ -1,6 +1,7 @@
 import { IconThumbUp } from "@tabler/icons-react";
 import Button from "./../Button/Button";
 import BlogProps from "./BlogProps";
+import { motion } from "framer-motion";
 
 function Blog({ blog }: BlogProps) {
   return (
@@ -13,11 +14,18 @@ function Blog({ blog }: BlogProps) {
       <div>
         <Button color="white">Download</Button>
       </div>
-      <div className="text-gray-800">
-        <span>
-          <IconThumbUp className="inline" /> 7
-        </span>
-        <span className="pl-5">7 comments</span>
+      <div className="text-gray-800 flex gap-5 items-center">
+        <div className="flex justify-center gap-1">
+          <motion.div
+            initial={{ scale: 1 }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.85 }}
+          >
+            <IconThumbUp className="cursor-pointer" />
+          </motion.div>{" "}
+          7
+        </div>
+        <div className="">7 comments</div>
       </div>
     </div>
   );

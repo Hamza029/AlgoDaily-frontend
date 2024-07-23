@@ -4,9 +4,11 @@ import { AxiosError } from "axios";
 import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
 
-async function getAllBlogs(page: number) {
+async function getAllBlogs(page: number, searchText: string) {
   try {
-    const res = await apiClient.get(`/api/blogs?page=${page}`);
+    const res = await apiClient.get(
+      `/api/blogs?page=${page}&search=${searchText}`,
+    );
     return parseResponse<BlogResponse[]>(res);
   } catch (err) {
     const errResponse = parseError(err as AxiosError);
