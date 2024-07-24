@@ -1,6 +1,11 @@
 import ButtonProps from "./ButtonProps";
 
-function Button({ children, handleClick = () => {}, color }: ButtonProps) {
+function Button({
+  children,
+  handleClick = () => {},
+  color,
+  rounded = true,
+}: ButtonProps) {
   const textColor = color === "black" ? "text-white" : "text-gray-800";
   const buttonColor = color === "black" ? "bg-gray-800" : "bg-gray-200";
   const buttonColorHover =
@@ -9,7 +14,7 @@ function Button({ children, handleClick = () => {}, color }: ButtonProps) {
   return (
     <>
       <button
-        className={`px-3 py-2 rounded-3xl font-medium ${textColor} ${buttonColor} ${buttonColorHover} duration-300`}
+        className={`px-3 py-2 ${rounded ? "rounded-3xl" : "rounded-sm"} font-medium ${textColor} ${buttonColor} ${buttonColorHover} duration-300`}
         onClick={handleClick}
         type="submit"
       >

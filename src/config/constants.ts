@@ -35,3 +35,9 @@ export enum HTTPStatusCode {
   ServiceUnavailable = 503,
   GatewayTiemout = 504,
 }
+
+export const enum FILTER_TYPE {
+  OLDEST,
+  NEWEST,
+  POPULAR,
+}

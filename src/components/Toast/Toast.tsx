@@ -7,7 +7,7 @@ export default function Toast({
   handleToastClose,
 }: ToastProps) {
   return (
-    <div>
+    <div className="">
       <Snackbar open={true} autoHideDuration={3000} onClose={handleToastClose}>
         <Alert
           onClose={handleToastClose}

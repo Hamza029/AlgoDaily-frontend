@@ -6,6 +6,8 @@ import { House } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import Button from "../Button/Button";
+import { IconUser, IconLogout } from "@tabler/icons-react";
+import { Tooltip } from "@mui/material";
 
 function Navbar({ isAuthPage }: NavbarProps) {
   const { checkLoggedIn, setToken } = useContext(AuthContext);
@@ -27,13 +29,14 @@ function Navbar({ isAuthPage }: NavbarProps) {
           {checkLoggedIn() ? (
             <>
               <NavButton link={ROUTES.LOGIN} filled={false}>
-                Write
-              </NavButton>
-              <NavButton link={ROUTES.LOGIN} filled={false}>
-                MyProfile
+                <Tooltip title="Profile">
+                  <IconUser className="w-full" />
+                </Tooltip>
               </NavButton>
               <Button color="black" handleClick={(_e) => setToken(null)}>
-                Logout
+                <span className="flex items-center gap-1">
+                  Logout <IconLogout />
+                </span>
               </Button>
             </>
           ) : (
