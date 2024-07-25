@@ -22,7 +22,7 @@ function useFetchBlogs() {
       .catch((err) => {
         setErrorMessage(() => (err as AppError).message);
       });
-  }, [currentPage, filterType, searchText]);
+  }, [currentPage, filterType, searchText, setSearchText]);
 
   return {
     blogs,

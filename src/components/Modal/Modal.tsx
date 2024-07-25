@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import Backdrop from "./Backdrop";
 import ModalProps from "./ModalProps";
-import { IconXboxXFilled } from "@tabler/icons-react";
+import { CircleX } from "lucide-react";
 
 const dropIn = {
   hidden: {
@@ -30,10 +30,10 @@ function Modal({ children, handleClose }: ModalProps) {
         exit="exit"
       >
         <button
-          className="absolute top-2 right-2 text-red-500"
+          className="absolute top-2 right-2 text-red-700 hover:rotate-90 duration-200"
           onClick={handleClose}
         >
-          <IconXboxXFilled />
+          <CircleX />
         </button>
         {children}
       </motion.div>

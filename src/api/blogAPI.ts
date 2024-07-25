@@ -17,6 +17,21 @@ async function getAllBlogs(page: number, searchText: string) {
   }
 }
 
+async function createBlog(title: string, description: string) {
+  try {
+    const res = await apiClient.post(
+      "api/blogs",
+      { title: title, description: description },
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } },
+    );
+    return parseResponse(res);
+  } catch (err) {
+    const errResponse = parseError(err as AxiosError);
+    throw new AppError(errResponse.message, errResponse.status);
+  }
+}
+
 export default {
   getAllBlogs,
+  createBlog,
 };
