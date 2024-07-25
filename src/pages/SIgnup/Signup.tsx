@@ -3,7 +3,7 @@ import { SignupFormFields, validationSchema } from "./SignupSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
 import { Button, Toast } from "../../components";
-import { ROUTES } from "../../config/constants";
+import { BUTTON_COLOR, ROUTES } from "../../config/constants";
 import authAPI from "../../api/authAPI";
 import { AppError } from "../../helpers/AppError";
 import { useState } from "react";
@@ -100,13 +100,13 @@ function Signup() {
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button children="Signup" color="black" />
+              <Button children="Signup" color={BUTTON_COLOR.BLACK} />
             </div>
           </form>
 
           <div className="flex flex-col justify-center items-center lg:border-l-2 lg:pl-5">
             <p className="mb-3">Already have an account?</p>
-            <Button color="white">
+            <Button color={BUTTON_COLOR.GRAY}>
               <Link to={ROUTES.LOGIN}>Login instead</Link>
             </Button>
           </div>

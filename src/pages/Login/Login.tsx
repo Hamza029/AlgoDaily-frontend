@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginFormFields, validationSchema } from "./LoginSchema";
 import { Button, Toast } from "../../components";
 import { Link } from "react-router-dom";
-import { ROUTES } from "../../config/constants";
+import { BUTTON_COLOR, ROUTES } from "../../config/constants";
 import authAPI from "../../api/authAPI";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
@@ -73,13 +73,16 @@ function Login() {
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button children="Login" color="black" />
+              <Button children="Login" color={BUTTON_COLOR.BLACK} />
             </div>
           </form>
           <div className="flex flex-col justify-center items-center lg:border-l-2 lg:pl-5">
             <p className="mb-3">Don't have an account?</p>
             <Link to={ROUTES.SIGNUP}>
-              <Button children="Create a new account" color="white" />
+              <Button
+                children="Create a new account"
+                color={BUTTON_COLOR.GRAY}
+              />
             </Link>
           </div>
         </div>

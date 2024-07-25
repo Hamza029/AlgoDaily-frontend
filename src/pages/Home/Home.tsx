@@ -9,6 +9,10 @@ import { Toast } from "../../components";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import useFetchBlogs from "../../hooks/useFetchBlogs";
 import { motion } from "framer-motion";
+import { FileText, FileJson, CodeXml } from "lucide-react";
+import { BUTTON_COLOR } from "../../config/constants";
+import blogAPI from "../../api/blogAPI";
+import { AppError } from "../../helpers/AppError";
 
 function Home() {
   const {
@@ -22,9 +26,15 @@ function Home() {
     setCurrentPage,
   } = useFetchBlogs();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] =
+    useState<boolean>(false);
   const { checkLoggedIn } = useContext(AuthContext);
   const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
+  const [blogTitleInput, setBlogTitleInput] = useState<string>("");
+  const [blogDescriptionInput, setBlogDescriptionInput] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleToastClose = () => {
     setErrorMessage(() => null);
@@ -32,6 +42,10 @@ function Home() {
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
+  };
+
+  const toggleDownloadModal = () => {
+    setIsDownloadModalOpen((prev) => !prev);
   };
 
   const handleSearch = () => {
@@ -44,6 +58,22 @@ function Home() {
     }
   };
 
+  const onBlogSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    blogAPI
+      .createBlog(blogTitleInput, blogDescriptionInput)
+      .then((res) => {
+        setBlogTitleInput((_prev) => "");
+        setBlogDescriptionInput((_prev) => "");
+        setSuccess(res.message);
+      })
+      .catch((err) => {
+        setBlogTitleInput((_prev) => "");
+        setBlogDescriptionInput((_prev) => "");
+        setError((err as AppError).message);
+      });
+  };
+
   return (
     <>
       {errorMessage && (
@@ -51,6 +81,20 @@ function Home() {
           message={errorMessage}
           severity="error"
           handleToastClose={handleToastClose}
+        />
+      )}
+      {error && (
+        <Toast
+          message={error}
+          severity="error"
+          handleToastClose={() => setError(null)}
+        />
+      )}
+      {success && (
+        <Toast
+          message={success}
+          severity="success"
+          handleToastClose={() => setSuccess(null)}
         />
       )}
       <div className="flex flex-col items-center pt-7 pb-14">
@@ -67,7 +111,11 @@ function Home() {
                 placeholder="Search..."
                 className="w-full rounded-md px-3 py-1 focus:outline-none"
               />
-              <Button color="black" rounded={false} handleClick={handleSearch}>
+              <Button
+                color={BUTTON_COLOR.BLACK}
+                rounded={false}
+                handleClick={handleSearch}
+              >
                 <motion.div
                   initial={{ scale: 1 }}
                   whileHover={{ scale: 1.2 }}
@@ -81,7 +129,11 @@ function Home() {
           <div className="flex justify-center">
             <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7">
               {blogs.map((blog) => (
-                <Blog key={blog.id} blog={blog} />
+                <Blog
+                  key={blog.id}
+                  blog={blog}
+                  toggleDownloadModal={toggleDownloadModal}
+                />
               ))}
             </div>
             {!blogs.length && (
@@ -90,7 +142,7 @@ function Home() {
           </div>
           <div className="w-full border-t border-gray-300 pt-3 flex justify-center items-center gap-3">
             <Button
-              color="white"
+              color={BUTTON_COLOR.GRAY}
               handleClick={(_e) =>
                 setCurrentPage((prev) => Math.max(prev - 1, 1))
               }
@@ -99,7 +151,7 @@ function Home() {
             </Button>
             Page: <strong>{currentPage}</strong>
             <Button
-              color="white"
+              color={BUTTON_COLOR.GRAY}
               handleClick={(_e) => setCurrentPage((prev) => prev + 1)}
             >
               &rarr;
@@ -130,6 +182,8 @@ function Home() {
                   type="text"
                   className="border-2 border-gray-500 w-full rounded-lg mb-3 p-2"
                   placeholder="Title..."
+                  onChange={(e) => setBlogTitleInput(e.target.value)}
+                  value={blogTitleInput}
                 />
               </div>
               <div>
@@ -137,12 +191,40 @@ function Home() {
                   required
                   className="border-2 border-gray-500 resize-none w-full rounded-lg h-52 p-2"
                   placeholder="Description..."
+                  onChange={(e) => setBlogDescriptionInput(e.target.value)}
+                  value={blogDescriptionInput}
                 />
               </div>
               <div className="flex justify-center mt-2">
-                <Button color="black">Submit</Button>
+                <Button color={BUTTON_COLOR.GREEN} handleClick={onBlogSubmit}>
+                  Submit
+                </Button>
               </div>
             </form>
+          </Modal>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isDownloadModalOpen && (
+          <Modal handleClose={toggleDownloadModal}>
+            <div className="flex flex-col gap-3 items-center w-64 h-64 p-7 text-lg">
+              <div className="font-bold text-xl">Download as</div>
+              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+                <div className="flex justify-center items-center gap-3">
+                  Text <FileText />
+                </div>
+              </Button>
+              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+                <div className="flex justify-center items-center gap-3">
+                  JSON <FileJson />
+                </div>
+              </Button>
+              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+                <div className="flex justify-center items-center gap-3">
+                  XML <CodeXml />
+                </div>
+              </Button>
+            </div>
           </Modal>
         )}
       </AnimatePresence>

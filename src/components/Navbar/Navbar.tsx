@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import NavButton from "./NavButton";
-import { ROUTES } from "../../config/constants";
+import { BUTTON_COLOR, ROUTES } from "../../config/constants";
 import NavbarProps from "./NavbarProps";
 import { House } from "lucide-react";
 import { useContext } from "react";
@@ -33,7 +33,10 @@ function Navbar({ isAuthPage }: NavbarProps) {
                   <IconUser className="w-full" />
                 </Tooltip>
               </NavButton>
-              <Button color="black" handleClick={(_e) => setToken(null)}>
+              <Button
+                color={BUTTON_COLOR.RED}
+                handleClick={(_e) => setToken(null)}
+              >
                 <span className="flex items-center gap-1">
                   Logout <IconLogout />
                 </span>

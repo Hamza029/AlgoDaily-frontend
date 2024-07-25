@@ -41,3 +41,10 @@ export const enum FILTER_TYPE {
   NEWEST,
   POPULAR,
 }
+
+export const enum BUTTON_COLOR {
+  BLACK = "black",
+  GRAY = "gray",
+  GREEN = "green",
+  RED = "red",
+}
