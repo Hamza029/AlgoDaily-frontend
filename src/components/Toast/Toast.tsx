@@ -7,17 +7,20 @@ export default function Toast({
   handleToastClose,
 }: ToastProps) {
   return (
-    <div className="">
-      <Snackbar open={true} autoHideDuration={3000} onClose={handleToastClose}>
-        <Alert
-          onClose={handleToastClose}
-          severity={severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {message}
-        </Alert>
-      </Snackbar>
-    </div>
+    <Snackbar
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      open={true}
+      autoHideDuration={3000}
+      onClose={handleToastClose}
+    >
+      <Alert
+        onClose={handleToastClose}
+        severity={severity}
+        variant="filled"
+        sx={{ width: "100%" }}
+      >
+        {message}
+      </Alert>
+    </Snackbar>
   );
 }

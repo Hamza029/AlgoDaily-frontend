@@ -2,6 +2,7 @@ export enum ROUTES {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  PROFILE = "/profile",
 }
 
 export enum UserRole {
