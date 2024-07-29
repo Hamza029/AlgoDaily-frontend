@@ -1,14 +1,17 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { SignupFormFields, validationSchema } from "./SignupSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button, Toast } from "../../components";
 import { BUTTON_COLOR, ROUTES } from "../../config/constants";
 import authAPI from "../../api/authAPI";
 import { AppError } from "../../helpers/AppError";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 
 function Signup() {
+  const { checkLoggedIn } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -30,6 +33,8 @@ function Signup() {
 
   return (
     <>
+      {checkLoggedIn() && <Navigate to="/" replace={true} />}
+
       {signupError && (
         <Toast
           message={signupError}

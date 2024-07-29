@@ -17,10 +17,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // if someone manually modifies the token from browser
   useEffect(() => {
-    window.addEventListener("storage", (_e) => {
+    const handleLocalStorageChange = () => {
       console.log("--storage modified manually--");
       setToken(() => localStorage.getItem("token"));
-    });
+    };
+    window.addEventListener("storage", handleLocalStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleLocalStorageChange);
+    };
   }, []);
 
   // if token is modified then change currentUserId
@@ -34,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (checkIfTokenValid(token)) {
       return true;
     }
+    setToken(() => null);
     return false;
   };
 

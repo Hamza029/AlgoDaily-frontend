@@ -25,7 +25,7 @@ function Home() {
     setCurrentPage,
   } = useFetchBlogs();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { checkLoggedIn } = useContext(AuthContext);
+  const { checkLoggedIn, currentUserId } = useContext(AuthContext);
   const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
   const [blogTitleInput, setBlogTitleInput] = useState<string>("");
@@ -42,6 +42,7 @@ function Home() {
   };
 
   const handleSearch = () => {
+    setCurrentPage(() => 1);
     setSearchText(() => searchInput);
   };
 
@@ -61,8 +62,6 @@ function Home() {
         setSuccess(res.message);
       })
       .catch((err) => {
-        setBlogTitleInput((_prev) => "");
-        setBlogDescriptionInput((_prev) => "");
         setError((err as AppError).message);
       });
   };
@@ -120,9 +119,13 @@ function Home() {
             </div>
           </div>
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7">
+            <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
               {blogs.map((blog) => (
-                <Blog key={blog.id} blog={blog} />
+                <Blog
+                  key={blog.id}
+                  blog={blog}
+                  currentUserId={currentUserId || ""}
+                />
               ))}
             </div>
             {!blogs.length && (

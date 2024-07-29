@@ -4,10 +4,10 @@ import { AxiosError } from "axios";
 import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
 
-async function getAllBlogs(page: number, searchText: string) {
+async function getAllBlogs(page: number, searchText: string, authorId: string) {
   try {
     const res = await apiClient.get(
-      `/api/blogs?page=${page}&search=${searchText}`,
+      `/api/blogs?page=${page}&search=${searchText}&authorId=${authorId}`,
     );
     return parseResponse<BlogResponse[]>(res);
   } catch (err) {

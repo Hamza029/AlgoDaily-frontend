@@ -1,4 +1,4 @@
-import { IconThumbUp } from "@tabler/icons-react";
+import { IconThumbUp, IconEdit } from "@tabler/icons-react";
 import Button from "./../Button/Button";
 import BlogProps from "./BlogProps";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,7 +7,7 @@ import { BUTTON_COLOR } from "../../config/constants";
 import Modal from "../Modal/Modal";
 import { useState } from "react";
 
-function Blog({ blog }: BlogProps) {
+function Blog({ blog, currentUserId }: BlogProps) {
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
 
@@ -18,13 +18,13 @@ function Blog({ blog }: BlogProps) {
   return (
     <>
       <div className="flex flex-col items-start gap-2 p-7 w-80 md:w-[500px] lg:w-[480px] shadow-lg rounded-lg h-fit">
-        <div className="text-2xl text-gray-800 font-semibold max-w-64 md:max-w-[420px] overflow-hidden text-wrap">
+        <div className="text-2xl text-gray-800 font-semibold max-w-64 md:max-w-[420px] overflow-hidden text-wrap line-clamp-2">
           {blog.title}
         </div>
         <div className="text-md text-gray-600 border-b-2 w-full pb-1 font-semibold">
           Author: {blog.authorUsername}
         </div>
-        <div className="text-lg text-gray-800 max-w-64 md:max-w-[420px] overflow-hidden text-wrap">
+        <div className="text-lg text-gray-800 max-w-64 md:max-w-[420px] overflow-hidden text-wrap line-clamp-2">
           {blog.description}
         </div>
         <div>
@@ -41,11 +41,14 @@ function Blog({ blog }: BlogProps) {
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
             >
-              <IconThumbUp className="cursor-pointer" />
+              <IconThumbUp className="cursor-pointer text-gray-700" />
             </motion.div>{" "}
             7
           </div>
           <div className="">7 comments</div>
+          {currentUserId === blog.authorId && (
+            <IconEdit className="cursor-pointer text-gray-700" />
+          )}
         </div>
       </div>
       <AnimatePresence>

@@ -37,15 +37,20 @@ export enum HTTPStatusCode {
   GatewayTiemout = 504,
 }
 
-export const enum FILTER_TYPE {
+export enum FILTER_TYPE {
   OLDEST,
   NEWEST,
   POPULAR,
 }
 
-export const enum BUTTON_COLOR {
+export enum BUTTON_COLOR {
   BLACK = "black",
   GRAY = "gray",
   GREEN = "green",
   RED = "red",
+}
+
+export enum PROFILE_TAB {
+  MY_PROFILE,
+  MY_BLOGS,
 }
