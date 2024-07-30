@@ -4,5 +4,6 @@ import Button from "./Button/Button";
 import Toast from "./Toast/Toast";
 import Blog from "./Blog/Blog";
 import FilterBar from "./Filter/FilterBar";
+import Modal from "./Modal/Modal";
 
-export { Navbar, Footer, Button, Toast, Blog, FilterBar };
+export { Navbar, Footer, Button, Toast, Blog, FilterBar, Modal };

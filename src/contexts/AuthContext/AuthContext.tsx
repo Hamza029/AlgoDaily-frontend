@@ -3,7 +3,7 @@ import AuthContextType from "./AuthContextType";
 import { checkIfTokenValid, getUserIdFromToken } from "../../helpers/utils";
 
 export const AuthContext = createContext<AuthContextType>({
-  checkLoggedIn: () => null,
+  checkLoggedIn: () => false,
   currentUserId: null,
   setToken: (_prev) => null,
 });
@@ -17,10 +17,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // if someone manually modifies the token from browser
   useEffect(() => {
-    window.addEventListener("storage", (_e) => {
+    const handleLocalStorageChange = () => {
       console.log("--storage modified manually--");
       setToken(() => localStorage.getItem("token"));
-    });
+    };
+    window.addEventListener("storage", handleLocalStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleLocalStorageChange);
+    };
   }, []);
 
   // if token is modified then change currentUserId

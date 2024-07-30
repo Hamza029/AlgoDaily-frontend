@@ -9,7 +9,6 @@ import { Toast } from "../../components";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import useFetchBlogs from "../../hooks/useFetchBlogs";
 import { motion } from "framer-motion";
-import { FileText, FileJson, CodeXml } from "lucide-react";
 import { BUTTON_COLOR } from "../../config/constants";
 import blogAPI from "../../api/blogAPI";
 import { AppError } from "../../helpers/AppError";
@@ -24,17 +23,18 @@ function Home() {
     setSearchText,
     currentPage,
     setCurrentPage,
+    fetchBlogs,
   } = useFetchBlogs();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isDownloadModalOpen, setIsDownloadModalOpen] =
-    useState<boolean>(false);
-  const { checkLoggedIn } = useContext(AuthContext);
+  const { checkLoggedIn, currentUserId } = useContext(AuthContext);
   const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
   const [blogTitleInput, setBlogTitleInput] = useState<string>("");
   const [blogDescriptionInput, setBlogDescriptionInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const isLoggedIn: boolean = checkLoggedIn();
 
   const handleToastClose = () => {
     setErrorMessage(() => null);
@@ -44,11 +44,8 @@ function Home() {
     setIsModalOpen((prev) => !prev);
   };
 
-  const toggleDownloadModal = () => {
-    setIsDownloadModalOpen((prev) => !prev);
-  };
-
   const handleSearch = () => {
+    setCurrentPage(() => 1);
     setSearchText(() => searchInput);
   };
 
@@ -66,10 +63,9 @@ function Home() {
         setBlogTitleInput((_prev) => "");
         setBlogDescriptionInput((_prev) => "");
         setSuccess(res.message);
+        fetchBlogs();
       })
       .catch((err) => {
-        setBlogTitleInput((_prev) => "");
-        setBlogDescriptionInput((_prev) => "");
         setError((err as AppError).message);
       });
   };
@@ -127,12 +123,16 @@ function Home() {
             </div>
           </div>
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7">
+            <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
               {blogs.map((blog) => (
                 <Blog
                   key={blog.id}
                   blog={blog}
-                  toggleDownloadModal={toggleDownloadModal}
+                  currentUserId={currentUserId || ""}
+                  isLoggedIn={isLoggedIn}
+                  setSuccess={setSuccess}
+                  setError={setError}
+                  fetchBlogs={fetchBlogs}
                 />
               ))}
             </div>
@@ -201,30 +201,6 @@ function Home() {
                 </Button>
               </div>
             </form>
-          </Modal>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {isDownloadModalOpen && (
-          <Modal handleClose={toggleDownloadModal}>
-            <div className="flex flex-col gap-3 items-center w-64 h-64 p-7 text-lg">
-              <div className="font-bold text-xl">Download as</div>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
-                <div className="flex justify-center items-center gap-3">
-                  Text <FileText />
-                </div>
-              </Button>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
-                <div className="flex justify-center items-center gap-3">
-                  JSON <FileJson />
-                </div>
-              </Button>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
-                <div className="flex justify-center items-center gap-3">
-                  XML <CodeXml />
-                </div>
-              </Button>
-            </div>
           </Modal>
         )}
       </AnimatePresence>
