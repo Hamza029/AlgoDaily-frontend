@@ -7,6 +7,7 @@ import {
   IconUser,
   IconArticle,
   IconEdit,
+  IconShieldLock,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import useFetchBlogs from "../../hooks/useFetchBlogs";
@@ -17,6 +18,7 @@ import { Navigate } from "react-router-dom";
 import NameUpdateModal from "./NameUpdateModal";
 import userAPI from "../../api/userAPI";
 import { Tooltip } from "@mui/material";
+import PasswordUpdateForm from "./PasswordUpdateForm";
 
 function Profile() {
   const [profileTab, setProfileTab] = useState<PROFILE_TAB>(
@@ -25,7 +27,25 @@ function Profile() {
 
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  const { checkLoggedIn, currentUserId } = useContext(AuthContext);
+
+  const {
+    blogs,
+    errorMessage,
+    setErrorMessage,
+    setSearchText,
+    currentPage,
+    setCurrentPage,
+    fetchBlogs,
+  } = useFetchBlogs(currentUserId || "");
+
+  const searchInputId = useId();
+  const [searchInput, setSearchInput] = useState<string>("");
+
+  const isLoggedIn = checkLoggedIn();
 
   async function fetchCurrentUser() {
     userAPI
@@ -37,20 +57,6 @@ function Profile() {
         setError(() => (err as AppError).message);
       });
   }
-
-  const { checkLoggedIn, currentUserId } = useContext(AuthContext);
-
-  const {
-    blogs,
-    errorMessage,
-    setErrorMessage,
-    setSearchText,
-    currentPage,
-    setCurrentPage,
-  } = useFetchBlogs(currentUserId || "");
-
-  const searchInputId = useId();
-  const [searchInput, setSearchInput] = useState<string>("");
 
   const handleSearch = () => {
     setCurrentPage(() => 1);
@@ -70,7 +76,7 @@ function Profile() {
 
   return (
     <>
-      {!checkLoggedIn() && <Navigate to="/" replace={true} />}
+      {!isLoggedIn && <Navigate to="/" replace={true} />}
       <AnimatePresence>
         {modalOpen && (
           <NameUpdateModal
@@ -94,9 +100,16 @@ function Profile() {
           handleToastClose={() => setError(null)}
         />
       )}
+      {success && (
+        <Toast
+          message={success}
+          severity="success"
+          handleToastClose={() => setSuccess(null)}
+        />
+      )}
       <div>
         <div className="w-full flex justify-center mt-7">
-          <div className="w-[80%] md:w-[500px] lg:w-[600px] h-12 text-md md:text-lg bg-gray-100 flex justify-between">
+          <div className="w-[90%] md:w-[500px] lg:w-[600px] h-12 text-md md:text-lg bg-gray-100 flex justify-between">
             <div
               className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.MY_PROFILE ? "border-b-2 border-gray-800" : ""}`}
               onClick={(_e) => setProfileTab(() => PROFILE_TAB.MY_PROFILE)}
@@ -108,6 +121,13 @@ function Profile() {
               onClick={(_e) => setProfileTab(() => PROFILE_TAB.MY_BLOGS)}
             >
               Blogs <IconArticle className="inline-block ml-2 text-gray-600" />
+            </div>
+            <div
+              className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.SECURITY ? "border-b-2 border-gray-800" : ""}`}
+              onClick={(_e) => setProfileTab(() => PROFILE_TAB.SECURITY)}
+            >
+              Security
+              <IconShieldLock className="inline-block ml-2 text-gray-600" />
             </div>
           </div>
         </div>
@@ -180,6 +200,10 @@ function Profile() {
                       key={blog.id}
                       blog={blog}
                       currentUserId={currentUserId || ""}
+                      isLoggedIn={isLoggedIn}
+                      setSuccess={setSuccess}
+                      setError={setError}
+                      fetchBlogs={fetchBlogs}
                     />
                   ))}
                 </div>
@@ -207,6 +231,7 @@ function Profile() {
             </div>
           </motion.div>
         )}
+        {profileTab === PROFILE_TAB.SECURITY && <PasswordUpdateForm />}
       </div>
     </>
   );

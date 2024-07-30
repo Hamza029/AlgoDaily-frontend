@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import blogAPI from "../api/blogAPI";
 import { AppError } from "../helpers/AppError";
 import { BlogResponse } from "../shared/types";
@@ -12,8 +12,7 @@ function useFetchBlogs(crrentAuthorId: string = "") {
   const [filterType, setFilterType] = useState<FILTER_TYPE>(FILTER_TYPE.OLDEST);
   const [authorId, setAuthorId] = useState<string>(crrentAuthorId);
 
-  useEffect(() => {
-    // if the dependencies change then fetch blogs again
+  const fetchBlogs = useCallback(() => {
     blogAPI
       .getAllBlogs(currentPage, searchText, authorId)
       .then((res) => {
@@ -23,7 +22,12 @@ function useFetchBlogs(crrentAuthorId: string = "") {
       .catch((err) => {
         setErrorMessage(() => (err as AppError).message);
       });
-  }, [currentPage, filterType, searchText, authorId]);
+  }, [currentPage, searchText, authorId]);
+
+  useEffect(() => {
+    // if the dependencies change then fetch blogs again
+    fetchBlogs();
+  }, [currentPage, filterType, searchText, authorId, fetchBlogs]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -40,6 +44,7 @@ function useFetchBlogs(crrentAuthorId: string = "") {
     searchText,
     setSearchText,
     setAuthorId,
+    fetchBlogs,
   };
 }
 

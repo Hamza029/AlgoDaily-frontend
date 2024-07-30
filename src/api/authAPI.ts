@@ -29,7 +29,31 @@ async function signup(inputs: SignupFormFields) {
       Password: inputs.Password,
     });
 
-    return parseResponse<null>(res);
+    return parseResponse(res);
+  } catch (err) {
+    const errorResponse = parseError(err as AxiosError);
+    const appError = new AppError(errorResponse.message, errorResponse.status);
+    throw appError;
+  }
+}
+
+async function updateMyPassword(currentPassword: string, newPassword: string) {
+  try {
+    console.log(currentPassword, newPassword);
+    const res = await apiClient.patch(
+      "/api/auth/password",
+      {
+        currentPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      },
+    );
+
+    return parseResponse(res);
   } catch (err) {
     const errorResponse = parseError(err as AxiosError);
     const appError = new AppError(errorResponse.message, errorResponse.status);
@@ -40,4 +64,5 @@ async function signup(inputs: SignupFormFields) {
 export default {
   login,
   signup,
+  updateMyPassword,
 };

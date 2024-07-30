@@ -23,6 +23,7 @@ function Home() {
     setSearchText,
     currentPage,
     setCurrentPage,
+    fetchBlogs,
   } = useFetchBlogs();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
@@ -32,6 +33,8 @@ function Home() {
   const [blogDescriptionInput, setBlogDescriptionInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const isLoggedIn: boolean = checkLoggedIn();
 
   const handleToastClose = () => {
     setErrorMessage(() => null);
@@ -60,6 +63,7 @@ function Home() {
         setBlogTitleInput((_prev) => "");
         setBlogDescriptionInput((_prev) => "");
         setSuccess(res.message);
+        fetchBlogs();
       })
       .catch((err) => {
         setError((err as AppError).message);
@@ -125,6 +129,10 @@ function Home() {
                   key={blog.id}
                   blog={blog}
                   currentUserId={currentUserId || ""}
+                  isLoggedIn={isLoggedIn}
+                  setSuccess={setSuccess}
+                  setError={setError}
+                  fetchBlogs={fetchBlogs}
                 />
               ))}
             </div>

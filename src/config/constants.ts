@@ -53,4 +53,5 @@ export enum BUTTON_COLOR {
 export enum PROFILE_TAB {
   MY_PROFILE,
   MY_BLOGS,
+  SECURITY,
 }

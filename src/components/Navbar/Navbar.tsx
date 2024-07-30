@@ -13,6 +13,8 @@ function Navbar({ isAuthPage }: NavbarProps) {
   const { checkLoggedIn, setToken } = useContext(AuthContext);
   const [profileDropdown, setProfileDropdown] = useState<boolean>(false);
 
+  const isLoggedIn = checkLoggedIn();
+
   const toggleProfileDropdown = () => {
     setProfileDropdown((prev) => !prev);
   };
@@ -38,7 +40,7 @@ function Navbar({ isAuthPage }: NavbarProps) {
       )}
       {!isAuthPage && (
         <div className="flex justify-between items-center gap-1 font-medium text-lg">
-          {checkLoggedIn() ? (
+          {isLoggedIn ? (
             <div className="relative">
               <Button
                 color={BUTTON_COLOR.BLACK}
