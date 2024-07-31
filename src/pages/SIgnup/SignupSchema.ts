@@ -1,15 +1,15 @@
 import * as Yup from "yup";
 
 export interface SignupFormFields {
-  Username: string;
-  Name: string;
-  Email: string;
-  Password: string;
-  ConfirmPassword: string;
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export const validationSchema: Yup.ObjectSchema<SignupFormFields> = Yup.object({
-  Username: Yup.string()
+  username: Yup.string()
     .trim()
     .required("This field is required")
     .matches(
@@ -18,18 +18,18 @@ export const validationSchema: Yup.ObjectSchema<SignupFormFields> = Yup.object({
     )
     .min(1, "Username must have least one character")
     .max(20, "Username cannot exceed 20 characters"),
-  Name: Yup.string()
+  name: Yup.string()
     .required("This field is required")
     .trim()
     .min(1, "Name must contain at least 1 character")
     .max(50, "Name cannot exceed 50 characters"),
-  Email: Yup.string()
+  email: Yup.string()
     .email("Must be a valid email")
     .required("This field is required"),
-  Password: Yup.string()
+  password: Yup.string()
     .required("This field is required")
     .min(4, "Password must have least 4 characters"),
-  ConfirmPassword: Yup.string()
+  confirmPassword: Yup.string()
     .required("This field is required")
-    .oneOf([Yup.ref("Password")], "Passwords must match"),
+    .oneOf([Yup.ref("password")], "Passwords must match"),
 });

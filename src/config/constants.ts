@@ -3,6 +3,7 @@ export enum ROUTES {
   LOGIN = "/login",
   SIGNUP = "/signup",
   PROFILE = "/profile",
+  BLOG = "/blog/:blogId",
 }
 
 export enum UserRole {

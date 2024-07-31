@@ -5,7 +5,7 @@ export default function Layout() {
   return (
     <div className="relative min-h-screen">
       <Navbar isAuthPage={false} />
-      <div>
+      <div className="pb-20">
         <Outlet />
       </div>
       <Footer />

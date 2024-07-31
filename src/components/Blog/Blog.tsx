@@ -1,5 +1,6 @@
 import {
   IconThumbUp,
+  IconThumbUpFilled,
   IconEdit,
   IconMessageCircle,
   IconTrash,
@@ -11,7 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CodeXml, FileJson, FileText } from "lucide-react";
 import { BUTTON_COLOR } from "../../config/constants";
 import Modal from "../Modal/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tooltip } from "@mui/material";
 import blogAPI from "../../api/blogAPI";
 import { AppError } from "../../helpers/AppError";
@@ -32,6 +33,13 @@ function Blog({
   const [descriptionInput, setDescriptionInput] = useState<string>(
     blog.description,
   );
+  const [likeState, setLikeState] = useState<{
+    likeCount: number;
+    hasLiked: boolean;
+  }>({
+    likeCount: blog.likes.length,
+    hasLiked: false,
+  });
 
   const toggleDownloadModal = () => {
     setIsDownloadModalOpen((prev) => !prev);
@@ -66,11 +74,55 @@ function Blog({
       });
   };
 
+  const onLikeClick = () => {
+    if (isLoggedIn) {
+      if (!likeState.hasLiked) {
+        blogAPI
+          .likeBlogByBlogId(blog.id)
+          .then((_res) => {
+            setLikeState((prev) => ({
+              likeCount: prev.likeCount + 1,
+              hasLiked: true,
+            }));
+          })
+          .catch((err) => {
+            console.log((err as AppError).message);
+          });
+      } else {
+        blogAPI
+          .unlikeBlogByBlogId(blog.id)
+          .then((_res) => {
+            setLikeState((prev) => ({
+              likeCount: prev.likeCount - 1,
+              hasLiked: false,
+            }));
+          })
+          .catch((err) => {
+            console.log((err as AppError).message);
+          });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      blog.likes.forEach((like) => {
+        if (like.userId === currentUserId) {
+          setLikeState({ ...likeState, hasLiked: true });
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
-      <div className="flex flex-col items-start gap-3 p-7 w-80 md:w-[500px] lg:w-[480px] shadow-lg rounded-lg">
+      <div className="flex flex-col items-start gap-3 p-7 w-80 md:w-[500px] lg:w-[480px] shadow-lg rounded-lg border-2 border-gray-50">
         <div className="text-2xl text-gray-800 font-semibold max-w-64 md:max-w-[420px] overflow-hidden text-wrap line-clamp-2">
-          <Link to="/" className="hover:underline duration-300">
+          <Link
+            to={`/blog/${blog.id}`}
+            className="hover:underline duration-300"
+          >
             {blog.title}
           </Link>
         </div>
@@ -81,21 +133,29 @@ function Blog({
           {blog.description}
         </div>
         <div className="text-gray-700 flex gap-7 items-center w-full">
-          <Tooltip title="like">
+          <Tooltip
+            title={`${isLoggedIn && likeState.hasLiked ? "unlike" : "like"}`}
+          >
             <div className="flex justify-center gap-1">
               <motion.div
                 initial={{ scale: 1 }}
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.85 }}
+                onClick={onLikeClick}
               >
-                <IconThumbUp className="cursor-pointer" />
+                {isLoggedIn && likeState.hasLiked ? (
+                  <IconThumbUpFilled className="cursor-pointer" />
+                ) : (
+                  <IconThumbUp className="cursor-pointer" />
+                )}
               </motion.div>
-              7
+              {likeState.likeCount}
             </div>
           </Tooltip>
           <Tooltip title="comments">
             <div className="">
-              <IconMessageCircle className="inline-block cursor-pointer" /> 7
+              <IconMessageCircle className="inline-block cursor-pointer" />{" "}
+              {blog.comments.length}
             </div>
           </Tooltip>
           <Tooltip title="download">

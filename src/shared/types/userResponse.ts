@@ -1,6 +1,6 @@
 export default interface UserResponse {
-  Id: string;
-  Username: string;
-  Name: string;
-  Email: string;
+  id: string;
+  username: string;
+  name: string;
+  email: string;
 }

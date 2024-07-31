@@ -143,10 +143,10 @@ function Profile() {
             <div className="flex flex-col items-start gap-5">
               <div className="text-xl md:text-2xl">
                 <span className="font-bold">Username</span>:{" "}
-                {currentUser?.Username}
+                {currentUser?.username}
               </div>
               <div className="text-lg md:text-xl flex items-center gap-2">
-                <span className="font-bold">Name</span>: {currentUser?.Name}{" "}
+                <span className="font-bold">Name</span>: {currentUser?.name}{" "}
                 <Tooltip title="edit">
                   <IconEdit
                     className="cursor-pointer"
@@ -155,7 +155,7 @@ function Profile() {
                 </Tooltip>
               </div>
               <div className="text-lg md:text-xl">
-                <span className="font-bold">Email</span>: {currentUser?.Email}
+                <span className="font-bold">Email</span>: {currentUser?.email}
               </div>
             </div>
           </motion.div>

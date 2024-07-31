@@ -9,7 +9,7 @@ export const getUserIdFromToken = (authToken: string | null): string | null => {
   }
 
   try {
-    const id = (jwtDecode(authToken) as JWTPayload).Id;
+    const id = (jwtDecode(authToken) as JWTPayload).id;
     return id;
   } catch (err) {
     return null;

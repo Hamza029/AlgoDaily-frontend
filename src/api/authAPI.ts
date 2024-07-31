@@ -9,8 +9,8 @@ import { AppError } from "../helpers/AppError";
 async function login(loginInputs: LoginFormFields) {
   try {
     const res = await apiClient.post("/api/auth/login", {
-      Username: loginInputs.Username,
-      Password: loginInputs.Password,
+      username: loginInputs.username,
+      password: loginInputs.password,
     });
     return parseResponse<LoginResponse>(res);
   } catch (err) {
@@ -23,10 +23,10 @@ async function login(loginInputs: LoginFormFields) {
 async function signup(inputs: SignupFormFields) {
   try {
     const res = await apiClient.post("/api/auth/signup", {
-      Username: inputs.Username,
-      Email: inputs.Email,
-      Name: inputs.Name,
-      Password: inputs.Password,
+      username: inputs.username,
+      email: inputs.email,
+      name: inputs.name,
+      password: inputs.password,
     });
 
     return parseResponse(res);

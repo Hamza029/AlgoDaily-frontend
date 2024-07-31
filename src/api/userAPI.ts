@@ -19,7 +19,7 @@ async function updateUserById(userId: string, name: string) {
   try {
     const res = await apiClient.patch(
       `/api/users/${userId}`,
-      { Name: name },
+      { name: name },
       {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       },
