@@ -56,3 +56,10 @@ export enum PROFILE_TAB {
   MY_BLOGS,
   SECURITY,
 }
+
+export enum CONTENT_TYPE {
+  JSON = "application/json",
+  XML = "application/xml",
+  TEXT = "text/plain",
+  HTML = "text/html",
+}

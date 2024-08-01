@@ -10,13 +10,14 @@ import Button from "./../Button/Button";
 import BlogProps from "./BlogProps";
 import { AnimatePresence, motion } from "framer-motion";
 import { CodeXml, FileJson, FileText } from "lucide-react";
-import { BUTTON_COLOR } from "../../config/constants";
+import { BUTTON_COLOR, CONTENT_TYPE } from "../../config/constants";
 import Modal from "../Modal/Modal";
 import { useEffect, useState } from "react";
 import { Tooltip } from "@mui/material";
 import blogAPI from "../../api/blogAPI";
 import { AppError } from "../../helpers/AppError";
 import { Link } from "react-router-dom";
+import { downloadBlog } from "../../helpers/utils";
 
 function Blog({
   blog,
@@ -154,8 +155,10 @@ function Blog({
           </Tooltip>
           <Tooltip title="comments">
             <div className="">
-              <IconMessageCircle className="inline-block cursor-pointer" />{" "}
-              {blog.comments.length}
+              <Link to={`/blog/${blog.id}`}>
+                <IconMessageCircle className="inline-block cursor-pointer" />{" "}
+                {blog.comments.length}
+              </Link>
             </div>
           </Tooltip>
           <Tooltip title="download">
@@ -189,17 +192,32 @@ function Blog({
           <Modal handleClose={toggleDownloadModal}>
             <div className="flex flex-col gap-3 items-center w-64 h-64 p-7 text-lg">
               <div className="font-bold text-xl">Download as</div>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+              <Button
+                color={BUTTON_COLOR.GRAY}
+                wide={true}
+                rounded={false}
+                handleClick={downloadBlog(CONTENT_TYPE.TEXT, blog.id)}
+              >
                 <div className="flex justify-center items-center gap-3">
                   Text <FileText />
                 </div>
               </Button>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+              <Button
+                color={BUTTON_COLOR.GRAY}
+                wide={true}
+                rounded={false}
+                handleClick={downloadBlog(CONTENT_TYPE.JSON, blog.id)}
+              >
                 <div className="flex justify-center items-center gap-3">
                   JSON <FileJson />
                 </div>
               </Button>
-              <Button color={BUTTON_COLOR.GRAY} wide={true} rounded={false}>
+              <Button
+                color={BUTTON_COLOR.GRAY}
+                wide={true}
+                rounded={false}
+                handleClick={downloadBlog(CONTENT_TYPE.XML, blog.id)}
+              >
                 <div className="flex justify-center items-center gap-3">
                   XML <CodeXml />
                 </div>

@@ -3,6 +3,7 @@ import { BlogResponse } from "../shared/types";
 import { AxiosError } from "axios";
 import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
+import { CONTENT_TYPE, HTTPStatusCode } from "../config/constants";
 
 async function getAllBlogs(page: number, searchText: string, authorId: string) {
   try {
@@ -24,6 +25,36 @@ async function getBlogById(blogId: string) {
   } catch (err) {
     const errResponse = parseError(err as AxiosError);
     throw new AppError(errResponse.message, errResponse.status);
+  }
+}
+
+async function getBlogAsTextById(blogId: string) {
+  try {
+    const res = await apiClient.get(`/api/blogs/${blogId}`, {
+      headers: { Accept: CONTENT_TYPE.TEXT },
+    });
+    const data: string = res.data;
+    return data;
+  } catch (err) {
+    throw new AppError(
+      "Something went wrong",
+      HTTPStatusCode.InternalServerError,
+    );
+  }
+}
+
+async function getBlogAsXMLById(blogId: string) {
+  try {
+    const res = await apiClient.get(`/api/blogs/${blogId}`, {
+      headers: { Accept: CONTENT_TYPE.XML },
+    });
+    const data = res.data;
+    return data;
+  } catch (err) {
+    throw new AppError(
+      "Something went wrong",
+      HTTPStatusCode.InternalServerError,
+    );
   }
 }
 
@@ -98,7 +129,7 @@ async function unlikeBlogByBlogId(blogId: string) {
 async function createComment(blogId: string, content: string) {
   try {
     const res = await apiClient.post(
-      `api/blogs/${blogId}/like`,
+      `api/blogs/${blogId}/comment`,
       { content: content },
       {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -114,6 +145,8 @@ async function createComment(blogId: string, content: string) {
 export default {
   getAllBlogs,
   getBlogById,
+  getBlogAsTextById,
+  getBlogAsXMLById,
   createBlog,
   updateBlogById,
   deleteBlogById,
