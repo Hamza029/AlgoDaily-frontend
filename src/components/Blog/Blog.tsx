@@ -17,7 +17,10 @@ import { Tooltip } from "@mui/material";
 import blogAPI from "../../api/blogAPI";
 import { AppError } from "../../helpers/AppError";
 import { Link } from "react-router-dom";
-import { downloadBlog } from "../../helpers/utils";
+import { downloadBlog, formatDate } from "../../helpers/utils";
+import { BlogFormFields, blogValidationSchema } from "../../shared/types";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 function Blog({
   blog,
@@ -30,10 +33,6 @@ function Blog({
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  const [titleInput, setTitleInput] = useState<string>(blog.title);
-  const [descriptionInput, setDescriptionInput] = useState<string>(
-    blog.description,
-  );
   const [likeState, setLikeState] = useState<{
     likeCount: number;
     hasLiked: boolean;
@@ -50,10 +49,17 @@ function Blog({
     setIsEditModalOpen((prev) => !prev);
   };
 
-  const onBlogSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BlogFormFields>({
+    resolver: yupResolver(blogValidationSchema),
+  });
+
+  const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
     blogAPI
-      .updateBlogById(blog.id, titleInput, descriptionInput)
+      .updateBlogById(blog.id, data.title, data.description)
       .then((res) => {
         setSuccess(res.message);
         fetchBlogs();
@@ -126,6 +132,9 @@ function Blog({
           >
             {blog.title}
           </Link>
+        </div>
+        <div className="text-md text-gray-600 w-full pb-1">
+          Posted at: {formatDate(blog.createdAt)}
         </div>
         <div className="text-md text-gray-600 border-b-2 w-full pb-1 font-semibold">
           Author: {blog.authorUsername}
@@ -230,32 +239,30 @@ function Blog({
         {isEditModalOpen && (
           <Modal handleClose={toggleEditModal}>
             <form
-              action=""
-              className="w-[350px] md:w-[600px] h-96 p-10 text-lg"
+              className="w-[350px] md:w-[600px] px-10 py-7 text-lg"
+              onSubmit={handleSubmit(onBlogSubmit)}
             >
               <div>
+                <p className="text-red-500">{errors.title?.message}</p>
                 <input
-                  required
                   type="text"
                   className="border-2 border-gray-500 w-full rounded-lg mb-3 p-2"
                   placeholder="Title..."
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(() => e.target.value)}
+                  defaultValue={blog.title}
+                  {...register("title")}
                 />
               </div>
               <div>
+                <p className="text-red-500">{errors.description?.message}</p>
                 <textarea
-                  required
                   className="border-2 border-gray-500 resize-none w-full rounded-lg h-52 p-2"
                   placeholder="Description..."
-                  value={descriptionInput}
-                  onChange={(e) => setDescriptionInput(() => e.target.value)}
+                  defaultValue={blog.description}
+                  {...register("description")}
                 />
               </div>
               <div className="flex justify-center mt-2">
-                <Button color={BUTTON_COLOR.GREEN} handleClick={onBlogSubmit}>
-                  Submit
-                </Button>
+                <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
               </div>
             </form>
           </Modal>

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { BlogResponse } from "../../shared/types";
 import { useContext, useEffect, useState } from "react";
 import blogAPI from "../../api/blogAPI";
-import { Tooltip } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 import {
   IconThumbUpFilled,
   IconThumbUp,
@@ -18,7 +18,7 @@ import { Button, Modal } from "../../components";
 import { BUTTON_COLOR, CONTENT_TYPE } from "../../config/constants";
 import userAPI from "../../api/userAPI";
 import { CodeXml, FileJson, FileText } from "lucide-react";
-import { downloadBlog } from "../../helpers/utils";
+import { downloadBlog, formatDate, timeAgo } from "../../helpers/utils";
 
 interface CommentInfo {
   userId: string;
@@ -43,10 +43,12 @@ function Blog() {
   const [newComment, setNewComment] = useState<string>("");
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const isLoggedIn = checkLoggedIn();
 
   useEffect(() => {
+    setLoading((_p) => true);
     blogAPI
       .getBlogById(blogId!)
       .then((res) => {
@@ -63,6 +65,9 @@ function Blog() {
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setLoading((_p) => false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -123,128 +128,150 @@ function Blog() {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center mt-10 text-gray-900">
-        <div className="flex flex-col gap-7 w-[85%] md:w-[400px] lg:w-[650px]">
-          <div className="text-4xl font-bold">{blog?.title}</div>
-          <div className="text-lg font-bold text-gray-700 border-b-2 pb-2">
-            Author: {blog?.authorUsername}
-          </div>
-          <div className="text-lg">{blog?.description}</div>
-          <div className="text-gray-700 flex gap-7 items-center w-full">
-            <Tooltip
-              title={`${isLoggedIn && likeState.hasLiked ? "unlike" : "like"}`}
-            >
-              <div className="flex justify-center gap-1">
-                <motion.div
-                  initial={{ scale: 1 }}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.85 }}
-                  onClick={onLikeClick}
-                >
-                  {isLoggedIn && likeState.hasLiked ? (
-                    <IconThumbUpFilled className="cursor-pointer" />
-                  ) : (
-                    <IconThumbUp className="cursor-pointer" />
-                  )}
-                </motion.div>
-                {likeState.likeCount}
-              </div>
-            </Tooltip>
-            <Tooltip title="comments">
-              <div className="">
-                <IconMessageCircle className="inline-block cursor-pointer" />{" "}
-                {comments.length}
-              </div>
-            </Tooltip>
-            <Tooltip title="download">
-              <div>
-                <IconDownload
-                  className="cursor-pointer"
-                  onClick={toggleDownloadModal}
-                />
-              </div>
-            </Tooltip>
-            {isLoggedIn && currentUserId === blog?.authorId && (
-              <>
-                <Tooltip title="edit">
-                  <IconEdit
-                    className="cursor-pointer"
-                    // onClick={toggleEditModal}
-                  />
-                </Tooltip>
-                <Tooltip title="delete">
-                  <IconTrash
-                    className="cursor-pointer text-red-700"
-                    // onClick={onDelete}
-                  />
-                </Tooltip>
-              </>
-            )}
-          </div>
-          <div className="text-2xl w-full font-semibold">Comments:</div>
-          <div id="comments-section" className="flex flex-col gap-3 w-full">
-            {comments.map((comment, index) => (
-              <div key={index} className="flex gap-2 w-full border-b-2 pb-3">
-                <div className="font-semibold">{comment.username}:</div>
-                <div className="text-gray-500">{comment.content}</div>
-              </div>
-            ))}
-          </div>
-          {isLoggedIn && (
-            <div>
-              <textarea
-                required
-                className="border-2 border-gray-500 resize-none w-full rounded-lg h-30 p-2 mb-2"
-                placeholder="Share your opinion..."
-                value={newComment}
-                onChange={(e) => setNewComment(() => e.target.value)}
-              />
-              <Button color={BUTTON_COLOR.GREEN} handleClick={onCommentSubmit}>
-                Add comment
-              </Button>
-            </div>
-          )}
+      {!blog || loading ? (
+        <div className="w-full flex justify-center mt-20">
+          <CircularProgress color="inherit" />
         </div>
-      </div>
-      <AnimatePresence>
-        {isDownloadModalOpen && (
-          <Modal handleClose={toggleDownloadModal}>
-            <div className="flex flex-col gap-3 items-center w-64 h-64 p-7 text-lg">
-              <div className="font-bold text-xl">Download as</div>
-              <Button
-                color={BUTTON_COLOR.GRAY}
-                wide={true}
-                rounded={false}
-                handleClick={downloadBlog(CONTENT_TYPE.TEXT, blog!.id)}
-              >
-                <div className="flex justify-center items-center gap-3">
-                  Text <FileText />
+      ) : (
+        <>
+          <div className="flex flex-col justify-center items-center mt-10 text-gray-900">
+            <div className="flex flex-col gap-7 w-[85%] md:w-[400px] lg:w-[650px]">
+              <div className="text-4xl font-bold">{blog.title}</div>
+              <div className="text-sm text-gray-500 pb-2">
+                Posted at: {formatDate(blog.createdAt)}
+              </div>
+              <div className="text-lg font-bold text-gray-700 border-b-2">
+                Author: {blog?.authorUsername}
+              </div>
+              <div className="text-lg">{blog.description}</div>
+              <div className="text-gray-700 flex gap-7 items-center w-full">
+                <Tooltip
+                  title={`${isLoggedIn && likeState.hasLiked ? "unlike" : "like"}`}
+                >
+                  <div className="flex justify-center gap-1">
+                    <motion.div
+                      initial={{ scale: 1 }}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.85 }}
+                      onClick={onLikeClick}
+                    >
+                      {isLoggedIn && likeState.hasLiked ? (
+                        <IconThumbUpFilled className="cursor-pointer" />
+                      ) : (
+                        <IconThumbUp className="cursor-pointer" />
+                      )}
+                    </motion.div>
+                    {likeState.likeCount}
+                  </div>
+                </Tooltip>
+                <Tooltip title="comments">
+                  <div className="">
+                    <IconMessageCircle className="inline-block cursor-pointer" />{" "}
+                    {comments.length}
+                  </div>
+                </Tooltip>
+                <Tooltip title="download">
+                  <div>
+                    <IconDownload
+                      className="cursor-pointer"
+                      onClick={toggleDownloadModal}
+                    />
+                  </div>
+                </Tooltip>
+                {isLoggedIn && currentUserId === blog.authorId && (
+                  <>
+                    <Tooltip title="edit">
+                      <IconEdit
+                        className="cursor-pointer"
+                        // onClick={toggleEditModal}
+                      />
+                    </Tooltip>
+                    <Tooltip title="delete">
+                      <IconTrash
+                        className="cursor-pointer text-red-700"
+                        // onClick={onDelete}
+                      />
+                    </Tooltip>
+                  </>
+                )}
+              </div>
+              <div className="text-2xl w-full font-semibold">Comments:</div>
+              <div id="comments-section" className="flex flex-col gap-3 w-full">
+                {comments.map((comment, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-2 w-full border-b-2 pb-3"
+                  >
+                    <div className="font-semibold">{comment.username}:</div>
+                    <div className="text-gray-500 ml-3">
+                      <div>{comment.content}</div>
+                      <div className="text-sm mt-2 text-gray-700">
+                        {timeAgo(comment.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {isLoggedIn && (
+                <div>
+                  <textarea
+                    required
+                    className="border-2 border-gray-500 resize-none w-full rounded-lg h-30 p-2 mb-2"
+                    placeholder="Share your opinion..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(() => e.target.value)}
+                  />
+                  <Button
+                    color={BUTTON_COLOR.GREEN}
+                    handleClick={onCommentSubmit}
+                  >
+                    Add comment
+                  </Button>
                 </div>
-              </Button>
-              <Button
-                color={BUTTON_COLOR.GRAY}
-                wide={true}
-                rounded={false}
-                handleClick={downloadBlog(CONTENT_TYPE.JSON, blog!.id)}
-              >
-                <div className="flex justify-center items-center gap-3">
-                  JSON <FileJson />
-                </div>
-              </Button>
-              <Button
-                color={BUTTON_COLOR.GRAY}
-                wide={true}
-                rounded={false}
-                handleClick={downloadBlog(CONTENT_TYPE.XML, blog!.id)}
-              >
-                <div className="flex justify-center items-center gap-3">
-                  XML <CodeXml />
-                </div>
-              </Button>
+              )}
             </div>
-          </Modal>
-        )}
-      </AnimatePresence>
+          </div>
+          <AnimatePresence>
+            {isDownloadModalOpen && (
+              <Modal handleClose={toggleDownloadModal}>
+                <div className="flex flex-col gap-3 items-center w-64 h-64 p-7 text-lg">
+                  <div className="font-bold text-xl">Download as</div>
+                  <Button
+                    color={BUTTON_COLOR.GRAY}
+                    wide={true}
+                    rounded={false}
+                    handleClick={downloadBlog(CONTENT_TYPE.TEXT, blog!.id)}
+                  >
+                    <div className="flex justify-center items-center gap-3">
+                      Text <FileText />
+                    </div>
+                  </Button>
+                  <Button
+                    color={BUTTON_COLOR.GRAY}
+                    wide={true}
+                    rounded={false}
+                    handleClick={downloadBlog(CONTENT_TYPE.JSON, blog!.id)}
+                  >
+                    <div className="flex justify-center items-center gap-3">
+                      JSON <FileJson />
+                    </div>
+                  </Button>
+                  <Button
+                    color={BUTTON_COLOR.GRAY}
+                    wide={true}
+                    rounded={false}
+                    handleClick={downloadBlog(CONTENT_TYPE.XML, blog!.id)}
+                  >
+                    <div className="flex justify-center items-center gap-3">
+                      XML <CodeXml />
+                    </div>
+                  </Button>
+                </div>
+              </Modal>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </>
   );
 }

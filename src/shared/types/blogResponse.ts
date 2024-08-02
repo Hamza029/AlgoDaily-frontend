@@ -2,6 +2,7 @@ export interface LikeResponse {
   id: string;
   blogId: string;
   userId: string;
+  username: string;
 }
 
 export interface CommentResponse {
@@ -19,6 +20,7 @@ export default interface BlogResponse {
   title: string;
   description: string;
   authorUsername: string;
+  createdAt: Date;
   likes: LikeResponse[];
   comments: CommentResponse[];
 }

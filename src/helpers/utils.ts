@@ -4,6 +4,7 @@ import { AxiosResponse, AxiosError } from "axios";
 import APIResponse from "../shared/types/apiRespose";
 import blogAPI from "../api/blogAPI";
 import { CONTENT_TYPE } from "../config/constants";
+import { format, formatDistanceToNow } from "date-fns";
 
 export const getUserIdFromToken = (authToken: string | null): string | null => {
   if (!authToken || authToken === "") {
@@ -94,3 +95,11 @@ export const downloadBlog =
       }
     })();
   };
+
+export const timeAgo = (date: Date) => {
+  return formatDistanceToNow(new Date(date), { addSuffix: true });
+};
+
+export const formatDate = (date: Date) => {
+  return format(date, "MMMM dd, yyyy h:mm a");
+};

@@ -12,6 +12,9 @@ import { motion } from "framer-motion";
 import { BUTTON_COLOR } from "../../config/constants";
 import blogAPI from "../../api/blogAPI";
 import { AppError } from "../../helpers/AppError";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { BlogFormFields, blogValidationSchema } from "../../shared/types";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 function Home() {
   const {
@@ -29,8 +32,6 @@ function Home() {
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
   const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
-  const [blogTitleInput, setBlogTitleInput] = useState<string>("");
-  const [blogDescriptionInput, setBlogDescriptionInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -55,14 +56,21 @@ function Home() {
     }
   };
 
-  const onBlogSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<BlogFormFields>({
+    resolver: yupResolver(blogValidationSchema),
+  });
+
+  const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
     blogAPI
-      .createBlog(blogTitleInput, blogDescriptionInput)
+      .createBlog(data.title, data.description)
       .then((res) => {
-        setBlogTitleInput((_prev) => "");
-        setBlogDescriptionInput((_prev) => "");
         setSuccess(res.message);
+        reset();
         fetchBlogs();
       })
       .catch((err) => {
@@ -173,32 +181,28 @@ function Home() {
         {isModalOpen && (
           <Modal handleClose={toggleModal}>
             <form
-              action=""
-              className="w-[350px] md:w-[600px] h-96 p-10 text-lg"
+              className="w-[350px] md:w-[600px] px-10 py-7 text-lg"
+              onSubmit={handleSubmit(onBlogSubmit)}
             >
               <div>
+                <p className="text-red-500">{errors.title?.message}</p>
                 <input
-                  required
                   type="text"
                   className="border-2 border-gray-500 w-full rounded-lg mb-3 p-2"
                   placeholder="Title..."
-                  onChange={(e) => setBlogTitleInput(e.target.value)}
-                  value={blogTitleInput}
+                  {...register("title")}
                 />
               </div>
               <div>
+                <p className="text-red-500">{errors.description?.message}</p>
                 <textarea
-                  required
                   className="border-2 border-gray-500 resize-none w-full rounded-lg h-52 p-2"
                   placeholder="Description..."
-                  onChange={(e) => setBlogDescriptionInput(e.target.value)}
-                  value={blogDescriptionInput}
+                  {...register("description")}
                 />
               </div>
               <div className="flex justify-center mt-2">
-                <Button color={BUTTON_COLOR.GREEN} handleClick={onBlogSubmit}>
-                  Submit
-                </Button>
+                <Button color={BUTTON_COLOR.GREEN}>Create</Button>
               </div>
             </form>
           </Modal>

@@ -5,6 +5,10 @@ import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
 import { CONTENT_TYPE, HTTPStatusCode } from "../config/constants";
 
+// const sleep = (ms: number) => {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// };
+
 async function getAllBlogs(page: number, searchText: string, authorId: string) {
   try {
     const res = await apiClient.get(
@@ -20,6 +24,7 @@ async function getAllBlogs(page: number, searchText: string, authorId: string) {
 
 async function getBlogById(blogId: string) {
   try {
+    // await sleep(2000);
     const res = await apiClient.get(`/api/blogs/${blogId}`);
     return parseResponse<BlogResponse>(res);
   } catch (err) {
