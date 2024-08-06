@@ -1,5 +1,9 @@
-import { useParams } from "react-router-dom";
-import { BlogResponse } from "../../shared/types";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  BlogFormFields,
+  BlogResponse,
+  blogValidationSchema,
+} from "../../shared/types";
 import { useContext, useEffect, useState } from "react";
 import blogAPI from "../../api/blogAPI";
 import { CircularProgress, Tooltip } from "@mui/material";
@@ -14,11 +18,13 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { AppError } from "../../helpers/AppError";
-import { Button, Modal } from "../../components";
+import { Button, Modal, Toast } from "../../components";
 import { BUTTON_COLOR, CONTENT_TYPE } from "../../config/constants";
 import userAPI from "../../api/userAPI";
 import { CodeXml, FileJson, FileText } from "lucide-react";
 import { downloadBlog, formatDate, timeAgo } from "../../helpers/utils";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 interface CommentInfo {
   userId: string;
@@ -41,9 +47,13 @@ function Blog() {
   });
   const [comments, setComments] = useState<CommentInfo[]>([]);
   const [newComment, setNewComment] = useState<string>("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
 
   const isLoggedIn = checkLoggedIn();
 
@@ -126,8 +136,61 @@ function Blog() {
     setIsDownloadModalOpen((prev) => !prev);
   };
 
+  const toggleEditModal = () => {
+    setIsEditModalOpen((prev) => !prev);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BlogFormFields>({
+    resolver: yupResolver(blogValidationSchema),
+  });
+
+  const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
+    blogAPI
+      .updateBlogById(blogId!, data.title, data.description)
+      .then((res) => {
+        setSuccess(res.message);
+        setBlog((prev) => ({
+          ...prev!,
+          title: data.title,
+          description: data.description,
+        }));
+      })
+      .catch((err) => {
+        setError((err as AppError).message);
+      });
+  };
+
+  const onDelete = () => {
+    blogAPI
+      .deleteBlogById(blogId!)
+      .then((_res) => {
+        navigate("/");
+      })
+      .catch((err) => {
+        setError((err as AppError).message);
+      });
+  };
+
   return (
     <>
+      {error && (
+        <Toast
+          message={error}
+          severity="error"
+          handleToastClose={() => setError("")}
+        />
+      )}
+      {success && (
+        <Toast
+          message={success}
+          severity="success"
+          handleToastClose={() => setSuccess("")}
+        />
+      )}
       {!blog || loading ? (
         <div className="w-full flex justify-center mt-20">
           <CircularProgress color="inherit" />
@@ -141,7 +204,13 @@ function Blog() {
                 Posted at: {formatDate(blog.createdAt)}
               </div>
               <div className="text-lg font-bold text-gray-700 border-b-2">
-                Author: {blog?.authorUsername}
+                Author:{" "}
+                <Link
+                  to={`/profile/${blog.authorId}`}
+                  className="hover:underline"
+                >
+                  {blog?.authorUsername}
+                </Link>
               </div>
               <div className="text-lg">{blog.description}</div>
               <div className="text-gray-700 flex gap-7 items-center w-full">
@@ -183,13 +252,13 @@ function Blog() {
                     <Tooltip title="edit">
                       <IconEdit
                         className="cursor-pointer"
-                        // onClick={toggleEditModal}
+                        onClick={toggleEditModal}
                       />
                     </Tooltip>
                     <Tooltip title="delete">
                       <IconTrash
                         className="cursor-pointer text-red-700"
-                        // onClick={onDelete}
+                        onClick={onDelete}
                       />
                     </Tooltip>
                   </>
@@ -202,7 +271,15 @@ function Blog() {
                     key={index}
                     className="flex gap-2 w-full border-b-2 pb-3"
                   >
-                    <div className="font-semibold">{comment.username}:</div>
+                    <div className="font-semibold">
+                      <Link
+                        to={`/profile/${comment.userId}`}
+                        className="hover:underline"
+                      >
+                        {comment.username}
+                      </Link>
+                      :
+                    </div>
                     <div className="text-gray-500 ml-3">
                       <div>{comment.content}</div>
                       <div className="text-sm mt-2 text-gray-700">
@@ -267,6 +344,41 @@ function Blog() {
                     </div>
                   </Button>
                 </div>
+              </Modal>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {isEditModalOpen && (
+              <Modal handleClose={toggleEditModal}>
+                <form
+                  className="w-[350px] md:w-[600px] px-10 py-7 text-lg"
+                  onSubmit={handleSubmit(onBlogSubmit)}
+                >
+                  <div>
+                    <p className="text-red-500">{errors.title?.message}</p>
+                    <input
+                      type="text"
+                      className="border-2 border-gray-500 w-full rounded-lg mb-3 p-2"
+                      placeholder="Title..."
+                      defaultValue={blog.title}
+                      {...register("title")}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-red-500">
+                      {errors.description?.message}
+                    </p>
+                    <textarea
+                      className="border-2 border-gray-500 resize-none w-full rounded-lg h-52 p-2"
+                      placeholder="Description..."
+                      defaultValue={blog.description}
+                      {...register("description")}
+                    />
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
+                  </div>
+                </form>
               </Modal>
             )}
           </AnimatePresence>

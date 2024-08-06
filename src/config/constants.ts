@@ -2,7 +2,7 @@ export enum ROUTES {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
-  PROFILE = "/profile",
+  PROFILE = "/profile/:userId",
   BLOG = "/blog/:blogId",
 }
 

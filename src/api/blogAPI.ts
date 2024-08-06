@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import { BlogResponse } from "../shared/types";
+import { BlogResponse, BlogResponseList } from "../shared/types";
 import { AxiosError } from "axios";
 import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
@@ -14,7 +14,7 @@ async function getAllBlogs(page: number, searchText: string, authorId: string) {
     const res = await apiClient.get(
       `/api/blogs?page=${page}&search=${searchText}&authorId=${authorId}`,
     );
-    return parseResponse<BlogResponse[]>(res);
+    return parseResponse<BlogResponseList>(res);
   } catch (err) {
     const errResponse = parseError(err as AxiosError);
     const appError = new AppError(errResponse.message, errResponse.status);

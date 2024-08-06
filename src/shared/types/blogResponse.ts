@@ -24,3 +24,8 @@ export default interface BlogResponse {
   likes: LikeResponse[];
   comments: CommentResponse[];
 }
+
+export interface BlogResponseList {
+  totalPages: number;
+  blogs: BlogResponse[];
+}

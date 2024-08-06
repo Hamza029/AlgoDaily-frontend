@@ -136,8 +136,11 @@ function Blog({
         <div className="text-md text-gray-600 w-full pb-1">
           Posted at: {formatDate(blog.createdAt)}
         </div>
-        <div className="text-md text-gray-600 border-b-2 w-full pb-1 font-semibold">
-          Author: {blog.authorUsername}
+        <div className="text-md text-gray-600 border-b-2 w-full pb-1 font-semibold flex gap-1">
+          Author:
+          <Link to={`/profile/${blog.authorId}`} className="hover:underline">
+            {blog.authorUsername}
+          </Link>
         </div>
         <div className="text-lg text-gray-800 max-w-64 md:max-w-[420px] overflow-hidden text-wrap line-clamp-2">
           {blog.description}

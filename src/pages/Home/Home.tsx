@@ -1,8 +1,8 @@
-import { Button, FilterBar } from "../../components";
+import { Button } from "../../components";
 import Blog from "../../components/Blog/Blog";
 import { useContext, useState, useId } from "react";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Stack, Pagination } from "@mui/material";
 import Modal from "../../components/Modal/Modal";
 import { AnimatePresence } from "framer-motion";
 import { Toast } from "../../components";
@@ -21,12 +21,12 @@ function Home() {
     blogs,
     errorMessage,
     setErrorMessage,
-    filterType,
-    setFilterType,
+    // filterType,
+    // setFilterType,
     setSearchText,
-    currentPage,
     setCurrentPage,
     fetchBlogs,
+    totalPages,
   } = useFetchBlogs();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
@@ -104,7 +104,7 @@ function Home() {
       <div className="flex flex-col items-center pt-7 pb-14">
         <div className="w-fit flex flex-col gap-7">
           <div className="md:w-[500px] lg:w-[988px]">
-            <FilterBar filterType={filterType} setFilterType={setFilterType} />
+            {/* <FilterBar filterType={filterType} setFilterType={setFilterType} /> */}
             <div className="border-2 border-gray-800 text-lg rounded-md flex mt-7">
               <input
                 id={searchInputId}
@@ -148,25 +148,18 @@ function Home() {
               <span className="text-xl">No blogs found :(</span>
             )}
           </div>
-          <div className="w-full border-t border-gray-300 pt-3 flex justify-center items-center gap-3">
-            <Button
-              color={BUTTON_COLOR.GRAY}
-              handleClick={(_e) =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
-            >
-              &larr;
-            </Button>
-            Page: <strong>{currentPage}</strong>
-            <Button
-              color={BUTTON_COLOR.GRAY}
-              handleClick={(_e) => setCurrentPage((prev) => prev + 1)}
-            >
-              &rarr;
-            </Button>
+
+          <div className="w-full flex justify-center">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                onChange={(_event, value) => setCurrentPage((_p) => value)}
+              />
+            </Stack>
           </div>
         </div>
       </div>
+
       {checkLoggedIn() && (
         <Tooltip title="Write a blog" placement="left">
           <button

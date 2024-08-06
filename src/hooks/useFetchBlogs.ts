@@ -11,12 +11,14 @@ function useFetchBlogs(crrentAuthorId: string = "") {
   const [searchText, setSearchText] = useState<string>("");
   const [filterType, setFilterType] = useState<FILTER_TYPE>(FILTER_TYPE.OLDEST);
   const [authorId, setAuthorId] = useState<string>(crrentAuthorId);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const fetchBlogs = useCallback(() => {
     blogAPI
       .getAllBlogs(currentPage, searchText, authorId)
       .then((res) => {
-        setBlogs(() => res.data);
+        setBlogs(() => res.data.blogs);
+        setTotalPages(() => res.data.totalPages);
         setErrorMessage(() => null);
       })
       .catch((err) => {
@@ -26,7 +28,16 @@ function useFetchBlogs(crrentAuthorId: string = "") {
 
   useEffect(() => {
     // if the dependencies change then fetch blogs again
-    fetchBlogs();
+    blogAPI
+      .getAllBlogs(currentPage, searchText, authorId)
+      .then((res) => {
+        setBlogs(() => res.data.blogs);
+        setTotalPages(() => res.data.totalPages);
+        setErrorMessage(() => null);
+      })
+      .catch((err) => {
+        setErrorMessage(() => (err as AppError).message);
+      });
   }, [currentPage, filterType, searchText, authorId, fetchBlogs]);
 
   useEffect(() => {
@@ -45,6 +56,7 @@ function useFetchBlogs(crrentAuthorId: string = "") {
     setSearchText,
     setAuthorId,
     fetchBlogs,
+    totalPages,
   };
 }
 

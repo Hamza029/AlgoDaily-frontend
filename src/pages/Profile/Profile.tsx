@@ -14,16 +14,18 @@ import useFetchBlogs from "../../hooks/useFetchBlogs";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { UserResponse } from "../../shared/types";
 import { AppError } from "../../helpers/AppError";
-import { Navigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import NameUpdateModal from "./NameUpdateModal";
 import userAPI from "../../api/userAPI";
-import { Tooltip } from "@mui/material";
+import { Pagination, Stack, Tooltip } from "@mui/material";
 import PasswordUpdateForm from "./PasswordUpdateForm";
 
 function Profile() {
   const [profileTab, setProfileTab] = useState<PROFILE_TAB>(
     PROFILE_TAB.MY_PROFILE,
   );
+
+  const { userId } = useParams();
 
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,24 +34,25 @@ function Profile() {
 
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
 
+  const searchInputId = useId();
+
   const {
     blogs,
     errorMessage,
     setErrorMessage,
     setSearchText,
-    currentPage,
     setCurrentPage,
     fetchBlogs,
-  } = useFetchBlogs(currentUserId || "");
+    totalPages,
+  } = useFetchBlogs(userId || "");
 
-  const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
 
   const isLoggedIn = checkLoggedIn();
 
-  async function fetchCurrentUser() {
+  async function fetchUser() {
     userAPI
-      .getUserById(currentUserId!)
+      .getUserById(userId!)
       .then((res) => {
         setCurrentUser(() => res.data);
       })
@@ -70,19 +73,19 @@ function Profile() {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
+    fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
-      {!isLoggedIn && <Navigate to="/" replace={true} />}
+      {/* {!isLoggedIn && <Navigate to="/" replace={true} />} */}
       <AnimatePresence>
         {modalOpen && (
           <NameUpdateModal
             setModalOpen={setModalOpen}
             userId={currentUserId!}
-            fetchCurrentUser={fetchCurrentUser}
+            fetchCurrentUser={fetchUser}
           />
         )}
       </AnimatePresence>
@@ -122,13 +125,15 @@ function Profile() {
             >
               Blogs <IconArticle className="inline-block ml-2 text-gray-600" />
             </div>
-            <div
-              className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.SECURITY ? "border-b-2 border-gray-800" : ""}`}
-              onClick={(_e) => setProfileTab(() => PROFILE_TAB.SECURITY)}
-            >
-              Security
-              <IconShieldLock className="inline-block ml-2 text-gray-600" />
-            </div>
+            {isLoggedIn && currentUserId === userId && (
+              <div
+                className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.SECURITY ? "border-b-2 border-gray-800" : ""}`}
+                onClick={(_e) => setProfileTab(() => PROFILE_TAB.SECURITY)}
+              >
+                Security
+                <IconShieldLock className="inline-block ml-2 text-gray-600" />
+              </div>
+            )}
           </div>
         </div>
         {profileTab === PROFILE_TAB.MY_PROFILE && (
@@ -147,12 +152,14 @@ function Profile() {
               </div>
               <div className="text-lg md:text-xl flex items-center gap-2">
                 <span className="font-bold">Name</span>: {currentUser?.name}{" "}
-                <Tooltip title="edit">
-                  <IconEdit
-                    className="cursor-pointer"
-                    onClick={(_e) => setModalOpen(() => true)}
-                  />
-                </Tooltip>
+                {isLoggedIn && currentUserId === userId && (
+                  <Tooltip title="edit">
+                    <IconEdit
+                      className="cursor-pointer"
+                      onClick={(_e) => setModalOpen(() => true)}
+                    />
+                  </Tooltip>
+                )}
               </div>
               <div className="text-lg md:text-xl">
                 <span className="font-bold">Email</span>: {currentUser?.email}
@@ -211,27 +218,20 @@ function Profile() {
                   <span className="text-xl">No blogs found :(</span>
                 )}
               </div>
-              <div className="w-full border-t border-gray-300 pt-3 flex justify-center items-center gap-3">
-                <Button
-                  color={BUTTON_COLOR.GRAY}
-                  handleClick={(_e) =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                >
-                  &larr;
-                </Button>
-                Page: <strong>{currentPage}</strong>
-                <Button
-                  color={BUTTON_COLOR.GRAY}
-                  handleClick={(_e) => setCurrentPage((prev) => prev + 1)}
-                >
-                  &rarr;
-                </Button>
+              <div className="w-full flex justify-center">
+                <Stack spacing={2}>
+                  <Pagination
+                    count={totalPages}
+                    onChange={(_event, value) => setCurrentPage((_p) => value)}
+                  />
+                </Stack>
               </div>
             </div>
           </motion.div>
         )}
-        {profileTab === PROFILE_TAB.SECURITY && <PasswordUpdateForm />}
+        {isLoggedIn &&
+          currentUserId === userId &&
+          profileTab === PROFILE_TAB.SECURITY && <PasswordUpdateForm />}
       </div>
     </>
   );

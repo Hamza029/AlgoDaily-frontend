@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { IconUser, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 
 function Navbar({ isAuthPage }: NavbarProps) {
-  const { checkLoggedIn, setToken } = useContext(AuthContext);
+  const { checkLoggedIn, setToken, currentUserId } = useContext(AuthContext);
   const [profileDropdown, setProfileDropdown] = useState<boolean>(false);
 
   const isLoggedIn = checkLoggedIn();
@@ -22,6 +22,7 @@ function Navbar({ isAuthPage }: NavbarProps) {
   const Logout = () => {
     setProfileDropdown(() => false);
     setToken(() => null);
+    window.location.reload();
   };
 
   return (
@@ -59,7 +60,7 @@ function Navbar({ isAuthPage }: NavbarProps) {
                   exit={{ scaleY: 0, opacity: 0 }}
                 >
                   <NavLink
-                    to={ROUTES.PROFILE}
+                    to={`/profile/${currentUserId}`}
                     className="flex justify-center items-center h-full hover:bg-gray-300 hover:text-xl rounded-t-lg duration-200"
                     onClick={() => setProfileDropdown(false)}
                   >
