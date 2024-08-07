@@ -1,8 +1,8 @@
 import { Button } from "../../components";
 import Blog from "../../components/Blog/Blog";
 import { useContext, useState, useId } from "react";
-import { IconPlus, IconSearch } from "@tabler/icons-react";
-import { Tooltip, Stack, Pagination } from "@mui/material";
+import { IconPlus, IconSearch, IconX } from "@tabler/icons-react";
+import { Tooltip, Stack, Pagination, CircularProgress } from "@mui/material";
 import Modal from "../../components/Modal/Modal";
 import { AnimatePresence } from "framer-motion";
 import { Toast } from "../../components";
@@ -15,25 +15,33 @@ import { AppError } from "../../helpers/AppError";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { BlogFormFields, blogValidationSchema } from "../../shared/types";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Home() {
+  const [searchParams] = useSearchParams();
+  const urlPage = Number(searchParams.get("page")) || 1;
+  const urlSearch = searchParams.get("search") || "";
   const {
     blogs,
     errorMessage,
     setErrorMessage,
     // filterType,
     // setFilterType,
+    searchText,
     setSearchText,
+    // currentPage,
     setCurrentPage,
     fetchBlogs,
     totalPages,
-  } = useFetchBlogs();
+    loading,
+  } = useFetchBlogs({ pageNumber: urlPage, blogSearchText: urlSearch });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
   const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const isLoggedIn: boolean = checkLoggedIn();
 
@@ -46,6 +54,8 @@ function Home() {
   };
 
   const handleSearch = () => {
+    const queryParams = `${searchInput ? `?search=${searchInput}` : ""}`;
+    navigate(queryParams);
     setCurrentPage(() => 1);
     setSearchText(() => searchInput);
   };
@@ -71,11 +81,26 @@ function Home() {
       .then((res) => {
         setSuccess(res.message);
         reset();
+        toggleModal();
         fetchBlogs();
       })
       .catch((err) => {
         setError((err as AppError).message);
       });
+  };
+
+  const handleClearSearch = () => {
+    const queryParams = `/${urlPage ? `?page=${urlPage}` : ""}`;
+    navigate(queryParams);
+    setSearchInput((_p) => "");
+    setSearchText((_p) => "");
+    setCurrentPage((_p) => urlPage);
+  };
+
+  const navigatePage = (pageNumber: number) => {
+    const queryParams = `?page=${pageNumber}${searchText ? `&search=${searchText}` : ""}`;
+    setCurrentPage((_p) => pageNumber);
+    navigate(queryParams);
   };
 
   return (
@@ -101,6 +126,7 @@ function Home() {
           handleToastClose={() => setSuccess(null)}
         />
       )}
+
       <div className="flex flex-col items-center pt-7 pb-14">
         <div className="w-fit flex flex-col gap-7">
           <div className="md:w-[500px] lg:w-[988px]">
@@ -115,6 +141,19 @@ function Home() {
                 placeholder="Search..."
                 className="w-full rounded-md px-3 py-1 focus:outline-none"
               />
+              {searchInput && (
+                <Tooltip title="clear search">
+                  <div>
+                    <Button
+                      color={BUTTON_COLOR.GRAY}
+                      rounded={false}
+                      handleClick={handleClearSearch}
+                    >
+                      <IconX />
+                    </Button>
+                  </div>
+                </Tooltip>
+              )}
               <Button
                 color={BUTTON_COLOR.BLACK}
                 rounded={false}
@@ -130,30 +169,40 @@ function Home() {
               </Button>
             </div>
           </div>
-          <div className="flex justify-center">
-            <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
-              {blogs.map((blog) => (
-                <Blog
-                  key={blog.id}
-                  blog={blog}
-                  currentUserId={currentUserId || ""}
-                  isLoggedIn={isLoggedIn}
-                  setSuccess={setSuccess}
-                  setError={setError}
-                  fetchBlogs={fetchBlogs}
-                />
-              ))}
+
+          {loading && (
+            <div className="w-full flex justify-center mt-10 mb-10">
+              <CircularProgress color="inherit" />
             </div>
-            {!blogs.length && (
-              <span className="text-xl">No blogs found :(</span>
-            )}
-          </div>
+          )}
+
+          {!loading && (
+            <div className="flex justify-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
+                {blogs.map((blog) => (
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    currentUserId={currentUserId || ""}
+                    isLoggedIn={isLoggedIn}
+                    setSuccess={setSuccess}
+                    setError={setError}
+                    fetchBlogs={fetchBlogs}
+                  />
+                ))}
+              </div>
+              {!blogs.length && (
+                <span className="text-xl">No blogs found :(</span>
+              )}
+            </div>
+          )}
 
           <div className="w-full flex justify-center">
             <Stack spacing={2}>
               <Pagination
                 count={totalPages}
-                onChange={(_event, value) => setCurrentPage((_p) => value)}
+                page={urlPage}
+                onChange={(_event, value) => navigatePage(value)}
               />
             </Stack>
           </div>

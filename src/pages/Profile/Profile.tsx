@@ -1,6 +1,6 @@
 import { useContext, useEffect, useId, useState } from "react";
 import { BUTTON_COLOR, PROFILE_TAB } from "../../config/constants";
-import { Blog, Button, Toast } from "../../components";
+import { Blog, Button, ProfileLoader, Toast } from "../../components";
 import {
   IconSearch,
   IconUserFilled,
@@ -31,6 +31,7 @@ function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [profileLoading, setProfileLoading] = useState<boolean>(false);
 
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
 
@@ -41,16 +42,18 @@ function Profile() {
     errorMessage,
     setErrorMessage,
     setSearchText,
+    currentPage,
     setCurrentPage,
     fetchBlogs,
     totalPages,
-  } = useFetchBlogs(userId || "");
+  } = useFetchBlogs({ currentAuthorId: userId });
 
   const [searchInput, setSearchInput] = useState<string>("");
 
   const isLoggedIn = checkLoggedIn();
 
   async function fetchUser() {
+    setProfileLoading((_p) => true);
     userAPI
       .getUserById(userId!)
       .then((res) => {
@@ -58,6 +61,9 @@ function Profile() {
       })
       .catch((err) => {
         setError(() => (err as AppError).message);
+      })
+      .finally(() => {
+        setProfileLoading((_p) => false);
       });
   }
 
@@ -145,26 +151,30 @@ function Profile() {
             <div className="border-r-2 border-gray-700">
               <IconUserFilled className="h-16 w-16 md:w-24 md:h-24" />
             </div>
-            <div className="flex flex-col items-start gap-5">
-              <div className="text-xl md:text-2xl">
-                <span className="font-bold">Username</span>:{" "}
-                {currentUser?.username}
+            {currentUser ? (
+              <div className="flex flex-col items-start gap-5">
+                <div className="text-xl md:text-2xl">
+                  <span className="font-bold">Username</span>:{" "}
+                  {currentUser?.username}
+                </div>
+                <div className="text-lg md:text-xl flex items-center gap-2">
+                  <span className="font-bold">Name</span>: {currentUser?.name}{" "}
+                  {isLoggedIn && currentUserId === userId && (
+                    <Tooltip title="edit">
+                      <IconEdit
+                        className="cursor-pointer"
+                        onClick={(_e) => setModalOpen(() => true)}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+                <div className="text-lg md:text-xl">
+                  <span className="font-bold">Email</span>: {currentUser?.email}
+                </div>
               </div>
-              <div className="text-lg md:text-xl flex items-center gap-2">
-                <span className="font-bold">Name</span>: {currentUser?.name}{" "}
-                {isLoggedIn && currentUserId === userId && (
-                  <Tooltip title="edit">
-                    <IconEdit
-                      className="cursor-pointer"
-                      onClick={(_e) => setModalOpen(() => true)}
-                    />
-                  </Tooltip>
-                )}
-              </div>
-              <div className="text-lg md:text-xl">
-                <span className="font-bold">Email</span>: {currentUser?.email}
-              </div>
-            </div>
+            ) : (
+              <ProfileLoader />
+            )}
           </motion.div>
         )}
         {profileTab === PROFILE_TAB.MY_BLOGS && (
@@ -222,6 +232,7 @@ function Profile() {
                 <Stack spacing={2}>
                   <Pagination
                     count={totalPages}
+                    page={currentPage}
                     onChange={(_event, value) => setCurrentPage((_p) => value)}
                   />
                 </Stack>

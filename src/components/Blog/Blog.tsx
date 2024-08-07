@@ -33,6 +33,7 @@ function Blog({
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [likeState, setLikeState] = useState<{
     likeCount: number;
     hasLiked: boolean;
@@ -47,6 +48,10 @@ function Blog({
 
   const toggleEditModal = () => {
     setIsEditModalOpen((prev) => !prev);
+  };
+
+  const toggleDeleteModal = () => {
+    setIsDeleteModalOpen((prev) => !prev);
   };
 
   const {
@@ -192,7 +197,7 @@ function Blog({
               <Tooltip title="delete">
                 <IconTrash
                   className="cursor-pointer text-red-700"
-                  onClick={onDelete}
+                  onClick={toggleDeleteModal}
                 />
               </Tooltip>
             </>
@@ -268,6 +273,33 @@ function Blog({
                 <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
               </div>
             </form>
+          </Modal>
+        )}
+        {isDeleteModalOpen && (
+          <Modal handleClose={toggleDeleteModal}>
+            <div className="w-72 p-7 flex flex-col items-center gap-3">
+              <div className="text-center font-semibold">
+                Are you sure?
+                <br />
+                This action cannot be undone
+              </div>
+              <Button
+                color={BUTTON_COLOR.GRAY}
+                rounded={false}
+                wide={true}
+                handleClick={toggleDeleteModal}
+              >
+                Cancel
+              </Button>
+              <Button
+                color={BUTTON_COLOR.RED}
+                rounded={false}
+                wide={true}
+                handleClick={onDelete}
+              >
+                Delete
+              </Button>
+            </div>
           </Modal>
         )}
       </AnimatePresence>

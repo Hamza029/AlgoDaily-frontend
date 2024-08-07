@@ -50,6 +50,7 @@ function Blog() {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
@@ -127,7 +128,7 @@ function Blog() {
         setComments((prev) => [...prev, currentComment]);
         setNewComment("");
       } catch (err) {
-        console.log(err);
+        setError((err as AppError).message);
       }
     })();
   };
@@ -173,6 +174,10 @@ function Blog() {
       .catch((err) => {
         setError((err as AppError).message);
       });
+  };
+
+  const toggleDeleteModal = () => {
+    setIsDeleteModalOpen((prev) => !prev);
   };
 
   return (
@@ -258,13 +263,15 @@ function Blog() {
                     <Tooltip title="delete">
                       <IconTrash
                         className="cursor-pointer text-red-700"
-                        onClick={onDelete}
+                        onClick={toggleDeleteModal}
                       />
                     </Tooltip>
                   </>
                 )}
               </div>
-              <div className="text-2xl w-full font-semibold">Comments:</div>
+              {comments.length > 0 && (
+                <div className="text-2xl w-full font-semibold">Comments:</div>
+              )}
               <div id="comments-section" className="flex flex-col gap-3 w-full">
                 {comments.map((comment, index) => (
                   <div
@@ -379,6 +386,33 @@ function Blog() {
                     <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
                   </div>
                 </form>
+              </Modal>
+            )}
+            {isDeleteModalOpen && (
+              <Modal handleClose={toggleDeleteModal}>
+                <div className="w-72 p-7 flex flex-col items-center gap-3">
+                  <div className="text-center font-semibold">
+                    Are you sure?
+                    <br />
+                    This action cannot be undone
+                  </div>
+                  <Button
+                    color={BUTTON_COLOR.GRAY}
+                    rounded={false}
+                    wide={true}
+                    handleClick={toggleDeleteModal}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color={BUTTON_COLOR.RED}
+                    rounded={false}
+                    wide={true}
+                    handleClick={onDelete}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </Modal>
             )}
           </AnimatePresence>
