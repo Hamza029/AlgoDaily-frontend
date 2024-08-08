@@ -134,6 +134,7 @@ async function unlikeBlogByBlogId(blogId: string) {
 
 async function createComment(blogId: string, content: string) {
   try {
+    await sleep(500);
     const res = await apiClient.post(
       `api/blogs/${blogId}/comment`,
       { content: content },

@@ -1,6 +1,6 @@
 import { Button } from "../../components";
 import Blog from "../../components/Blog/Blog";
-import { useContext, useState, useId } from "react";
+import { useContext, useState, useId, useEffect } from "react";
 import { IconPlus, IconSearch, IconX } from "@tabler/icons-react";
 import { Tooltip, Stack, Pagination, CircularProgress } from "@mui/material";
 import Modal from "../../components/Modal/Modal";
@@ -38,12 +38,20 @@ function Home() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
   const searchInputId = useId();
-  const [searchInput, setSearchInput] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>(urlSearch);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const isLoggedIn: boolean = checkLoggedIn();
+
+  useEffect(() => {
+    setCurrentPage(urlPage);
+    setSearchInput(urlSearch);
+    setSearchText(urlSearch);
+    fetchBlogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlPage, urlSearch]);
 
   const handleToastClose = () => {
     setErrorMessage(() => null);
@@ -90,11 +98,7 @@ function Home() {
   };
 
   const handleClearSearch = () => {
-    const queryParams = `/${urlPage ? `?page=${urlPage}` : ""}`;
-    navigate(queryParams);
     setSearchInput((_p) => "");
-    setSearchText((_p) => "");
-    setCurrentPage((_p) => urlPage);
   };
 
   const navigatePage = (pageNumber: number) => {
@@ -177,35 +181,36 @@ function Home() {
           )}
 
           {!loading && (
-            <div className="flex justify-center">
-              <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
-                {blogs.map((blog) => (
-                  <Blog
-                    key={blog.id}
-                    blog={blog}
-                    currentUserId={currentUserId || ""}
-                    isLoggedIn={isLoggedIn}
-                    setSuccess={setSuccess}
-                    setError={setError}
-                    fetchBlogs={fetchBlogs}
-                  />
-                ))}
+            <>
+              <div className="flex justify-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
+                  {blogs.map((blog) => (
+                    <Blog
+                      key={blog.id}
+                      blog={blog}
+                      currentUserId={currentUserId || ""}
+                      isLoggedIn={isLoggedIn}
+                      setSuccess={setSuccess}
+                      setError={setError}
+                      fetchBlogs={fetchBlogs}
+                    />
+                  ))}
+                </div>
+                {!blogs.length && (
+                  <span className="text-xl">No blogs found :(</span>
+                )}
               </div>
-              {!blogs.length && (
-                <span className="text-xl">No blogs found :(</span>
-              )}
-            </div>
+              <div className="w-full flex justify-center">
+                <Stack spacing={2}>
+                  <Pagination
+                    count={totalPages}
+                    page={urlPage}
+                    onChange={(_event, value) => navigatePage(value)}
+                  />
+                </Stack>
+              </div>
+            </>
           )}
-
-          <div className="w-full flex justify-center">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={urlPage}
-                onChange={(_event, value) => navigatePage(value)}
-              />
-            </Stack>
-          </div>
         </div>
       </div>
 

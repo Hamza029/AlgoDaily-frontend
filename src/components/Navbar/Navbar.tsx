@@ -6,7 +6,7 @@ import { House } from "lucide-react";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import Button from "../Button/Button";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { IconUser, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 
 function Navbar({ isAuthPage }: NavbarProps) {
@@ -52,29 +52,31 @@ function Navbar({ isAuthPage }: NavbarProps) {
                   {profileDropdown ? <IconChevronUp /> : <IconChevronDown />}
                 </span>
               </Button>
-              {profileDropdown && (
-                <motion.div
-                  className="h-24 w-32 flex flex-col justify-center bg-gray-100 rounded-lg shadow-2xl border-2 border-gray-700 absolute top-14 right-0"
-                  initial={{ scaleY: 0, opacity: 0 }}
-                  animate={{ scaleY: 1, opacity: 100 }}
-                  exit={{ scaleY: 0, opacity: 0 }}
-                >
-                  <NavLink
-                    to={`/profile/${currentUserId}`}
-                    className="flex justify-center items-center h-full hover:bg-gray-300 hover:text-xl rounded-t-lg duration-200"
-                    onClick={() => setProfileDropdown(false)}
+              <AnimatePresence>
+                {profileDropdown && (
+                  <motion.div
+                    className="h-24 w-32 flex flex-col justify-center bg-gray-100 rounded-lg shadow-2xl border-2 border-gray-700 absolute top-14 right-0"
+                    initial={{ y: -15, scaleY: 0, opacity: 0 }}
+                    animate={{ y: 0, scaleY: 1, opacity: 100 }}
+                    exit={{ y: -15, scaleY: 0, opacity: 0 }}
                   >
-                    Profile
-                  </NavLink>
-                  <div className="h-1 bg-gray-300"></div>
-                  <button
-                    onClick={Logout}
-                    className="flex justify-center items-center h-full hover:bg-gray-300 hover:text-xl rounded-b-lg duration-200"
-                  >
-                    <span className="text-red-500">Logout</span>
-                  </button>
-                </motion.div>
-              )}
+                    <NavLink
+                      to={`/profile/${currentUserId}`}
+                      className="flex justify-center items-center h-full hover:bg-gray-300 hover:text-xl rounded-t-lg duration-200"
+                      onClick={() => setProfileDropdown(false)}
+                    >
+                      Profile
+                    </NavLink>
+                    <div className="h-1 bg-gray-300"></div>
+                    <button
+                      onClick={Logout}
+                      className="flex justify-center items-center h-full hover:bg-gray-300 hover:text-xl rounded-b-lg duration-200"
+                    >
+                      <span className="text-red-500">Logout</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <>

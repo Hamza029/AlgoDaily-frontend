@@ -21,6 +21,7 @@ import { downloadBlog, formatDate } from "../../helpers/utils";
 import { BlogFormFields, blogValidationSchema } from "../../shared/types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import JoinNowPrompt from "../JoinNowPrompt/JoinNowPrompt";
 
 function Blog({
   blog,
@@ -34,6 +35,7 @@ function Blog({
     useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState<boolean>(false);
   const [likeState, setLikeState] = useState<{
     likeCount: number;
     hasLiked: boolean;
@@ -52,6 +54,10 @@ function Blog({
 
   const toggleDeleteModal = () => {
     setIsDeleteModalOpen((prev) => !prev);
+  };
+
+  const toggleJoinModal = () => {
+    setIsJoinModalOpen((prev) => !prev);
   };
 
   const {
@@ -113,6 +119,8 @@ function Blog({
             console.log((err as AppError).message);
           });
       }
+    } else {
+      toggleJoinModal();
     }
   };
 
@@ -302,6 +310,7 @@ function Blog({
             </div>
           </Modal>
         )}
+        {isJoinModalOpen && <JoinNowPrompt toggleJoinModal={toggleJoinModal} />}
       </AnimatePresence>
     </>
   );

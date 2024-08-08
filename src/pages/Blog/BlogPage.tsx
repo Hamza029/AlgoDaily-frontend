@@ -18,7 +18,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { AppError } from "../../helpers/AppError";
-import { Button, Modal, Toast } from "../../components";
+import { Button, JoinNowPrompt, Modal, Toast } from "../../components";
 import { BUTTON_COLOR, CONTENT_TYPE } from "../../config/constants";
 import userAPI from "../../api/userAPI";
 import { CodeXml, FileJson, FileText } from "lucide-react";
@@ -51,7 +51,9 @@ function Blog() {
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
     useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [commenting, setCommenting] = useState<boolean>(false);
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -74,8 +76,8 @@ function Blog() {
         setLikeState((prev) => ({ ...prev, likeCount: res.data.likes.length }));
         setComments(res.data.comments);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((_err) => {
+        navigate("404");
       })
       .finally(() => {
         setLoading((_p) => false);
@@ -110,12 +112,19 @@ function Blog() {
             console.log((err as AppError).message);
           });
       }
+    } else {
+      toggleJoinModal();
     }
   };
 
   const onCommentSubmit = () => {
+    if (commenting) {
+      return;
+    }
+
     (async () => {
       try {
+        setCommenting((_p) => true);
         await blogAPI.createComment(blog!.id, newComment);
         const currentUserRes = await userAPI.getUserById(currentUserId!);
         const currentUser = currentUserRes.data;
@@ -125,10 +134,12 @@ function Blog() {
           createdAt: new Date(),
           content: newComment,
         };
-        setComments((prev) => [...prev, currentComment]);
+        setComments((prev) => [currentComment, ...prev]);
         setNewComment("");
       } catch (err) {
         setError((err as AppError).message);
+      } finally {
+        setCommenting((_p) => false);
       }
     })();
   };
@@ -139,6 +150,10 @@ function Blog() {
 
   const toggleEditModal = () => {
     setIsEditModalOpen((prev) => !prev);
+  };
+
+  const toggleJoinModal = () => {
+    setIsJoinModalOpen((prev) => !prev);
   };
 
   const {
@@ -269,6 +284,36 @@ function Blog() {
                   </>
                 )}
               </div>
+              {isLoggedIn && (
+                <div>
+                  <textarea
+                    required
+                    className="border-2 border-gray-500 resize-none w-full rounded-lg h-30 p-2 mb-2"
+                    placeholder="Share your opinion..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(() => e.target.value)}
+                  />
+                  <div className="flex items-center">
+                    <Button
+                      color={BUTTON_COLOR.GREEN}
+                      handleClick={onCommentSubmit}
+                      disabled={commenting}
+                    >
+                      Add comment
+                    </Button>
+                    {commenting && (
+                      <span className="text-gray-500 text-sm ml-3">
+                        posting{" "}
+                        <CircularProgress
+                          color="inherit"
+                          size={10}
+                          className="ml-1"
+                        />
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
               {comments.length > 0 && (
                 <div className="text-2xl w-full font-semibold">Comments:</div>
               )}
@@ -296,23 +341,6 @@ function Blog() {
                   </div>
                 ))}
               </div>
-              {isLoggedIn && (
-                <div>
-                  <textarea
-                    required
-                    className="border-2 border-gray-500 resize-none w-full rounded-lg h-30 p-2 mb-2"
-                    placeholder="Share your opinion..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(() => e.target.value)}
-                  />
-                  <Button
-                    color={BUTTON_COLOR.GREEN}
-                    handleClick={onCommentSubmit}
-                  >
-                    Add comment
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
           <AnimatePresence>
@@ -414,6 +442,9 @@ function Blog() {
                   </Button>
                 </div>
               </Modal>
+            )}
+            {isJoinModalOpen && (
+              <JoinNowPrompt toggleJoinModal={toggleJoinModal} />
             )}
           </AnimatePresence>
         </>

@@ -4,6 +4,7 @@ export enum ROUTES {
   SIGNUP = "/signup",
   PROFILE = "/profile/:userId",
   BLOG = "/blog/:blogId",
+  NOT_FOUND = "*",
 }
 
 export enum UserRole {
@@ -52,9 +53,9 @@ export enum BUTTON_COLOR {
 }
 
 export enum PROFILE_TAB {
-  MY_PROFILE,
-  MY_BLOGS,
-  SECURITY,
+  INFO = "info",
+  MY_BLOGS = "blogs",
+  SECURITY = "security",
 }
 
 export enum CONTENT_TYPE {

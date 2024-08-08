@@ -1,3 +1,3 @@
-export default interface ButtonProps {
-  handleClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+export default interface JoinNowPromptProps {
+  toggleJoinModal: () => void;
 }

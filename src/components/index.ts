@@ -6,5 +6,16 @@ import Blog from "./Blog/Blog";
 import FilterBar from "./Filter/FilterBar";
 import Modal from "./Modal/Modal";
 import ProfileLoader from "./Loader/ProfileLoader";
+import JoinNowPrompt from "./JoinNowPrompt/JoinNowPrompt";
 
-export { Navbar, Footer, Button, Toast, Blog, FilterBar, Modal, ProfileLoader };
+export {
+  Navbar,
+  Footer,
+  Button,
+  Toast,
+  Blog,
+  FilterBar,
+  Modal,
+  ProfileLoader,
+  JoinNowPrompt,
+};
