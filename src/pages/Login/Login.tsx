@@ -57,9 +57,9 @@ function Login() {
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Username"
-                {...register("Username")}
+                {...register("username")}
               />
-              <p className="text-red-500">{errors.Username?.message}</p>
+              <p className="text-red-500">{errors.username?.message}</p>
             </div>
 
             <div className="mb-7">
@@ -67,9 +67,9 @@ function Login() {
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Password"
                 type="password"
-                {...register("Password")}
+                {...register("password")}
               />
-              <p className="text-red-500">{errors.Password?.message}</p>
+              <p className="text-red-500">{errors.password?.message}</p>
             </div>
 
             <div className="flex justify-center mb-7">

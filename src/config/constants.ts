@@ -2,7 +2,9 @@ export enum ROUTES {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
-  PROFILE = "/profile",
+  PROFILE = "/profile/:userId",
+  BLOG = "/blog/:blogId",
+  NOT_FOUND = "*",
 }
 
 export enum UserRole {
@@ -51,7 +53,14 @@ export enum BUTTON_COLOR {
 }
 
 export enum PROFILE_TAB {
-  MY_PROFILE,
-  MY_BLOGS,
-  SECURITY,
+  INFO = "info",
+  MY_BLOGS = "blogs",
+  SECURITY = "security",
+}
+
+export enum CONTENT_TYPE {
+  JSON = "application/json",
+  XML = "application/xml",
+  TEXT = "text/plain",
+  HTML = "text/html",
 }

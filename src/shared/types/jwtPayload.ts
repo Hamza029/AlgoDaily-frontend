@@ -1,10 +1,10 @@
 import { UserRole } from "../../config/constants";
 
 export default interface JWTPayload {
-  Id: string;
-  Username: string;
-  Name: string;
-  Role: UserRole;
+  id: string;
+  username: string;
+  name: string;
+  role: UserRole;
   iat: number;
   exp: number;
 }

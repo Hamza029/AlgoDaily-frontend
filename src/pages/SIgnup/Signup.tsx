@@ -61,27 +61,27 @@ function Signup() {
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Username"
-                {...register("Username")}
+                {...register("username")}
               />
-              <p className="text-red-500">{errors.Username?.message}</p>
+              <p className="text-red-500">{errors.username?.message}</p>
             </div>
 
             <div className="mb-2">
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Name"
-                {...register("Name")}
+                {...register("name")}
               />
-              <p className="text-red-500">{errors.Name?.message}</p>
+              <p className="text-red-500">{errors.name?.message}</p>
             </div>
 
             <div className="mb-2">
               <input
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Email"
-                {...register("Email")}
+                {...register("email")}
               />
-              <p className="text-red-500">{errors.Email?.message}</p>
+              <p className="text-red-500">{errors.email?.message}</p>
             </div>
 
             <div className="mb-2">
@@ -89,9 +89,9 @@ function Signup() {
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Password"
                 type="password"
-                {...register("Password")}
+                {...register("password")}
               />
-              <p className="text-red-500">{errors.Password?.message}</p>
+              <p className="text-red-500">{errors.password?.message}</p>
             </div>
 
             <div className="mb-7">
@@ -99,9 +99,9 @@ function Signup() {
                 className="border-b-2 px-3 py-2 w-full focus:outline-none focus:border-gray-800"
                 placeholder="Confirm Password"
                 type="password"
-                {...register("ConfirmPassword")}
+                {...register("confirmPassword")}
               />
-              <p className="text-red-500">{errors.ConfirmPassword?.message}</p>
+              <p className="text-red-500">{errors.confirmPassword?.message}</p>
             </div>
 
             <div className="flex justify-center mb-7">

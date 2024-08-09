@@ -1,6 +1,6 @@
 import { useContext, useEffect, useId, useState } from "react";
 import { BUTTON_COLOR, PROFILE_TAB } from "../../config/constants";
-import { Blog, Button, Toast } from "../../components";
+import { Blog, Button, ProfileLoader, Toast } from "../../components";
 import {
   IconSearch,
   IconUserFilled,
@@ -14,23 +14,30 @@ import useFetchBlogs from "../../hooks/useFetchBlogs";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { UserResponse } from "../../shared/types";
 import { AppError } from "../../helpers/AppError";
-import { Navigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NameUpdateModal from "./NameUpdateModal";
 import userAPI from "../../api/userAPI";
-import { Tooltip } from "@mui/material";
+import { CircularProgress, Pagination, Stack, Tooltip } from "@mui/material";
 import PasswordUpdateForm from "./PasswordUpdateForm";
 
 function Profile() {
-  const [profileTab, setProfileTab] = useState<PROFILE_TAB>(
-    PROFILE_TAB.MY_PROFILE,
-  );
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlProfileSection = searchParams.get("section") || PROFILE_TAB.INFO;
+
+  const [profileTab, setProfileTab] = useState<string>(urlProfileSection);
+
+  const { userId } = useParams();
 
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [profileLoading, setProfileLoading] = useState<boolean>(false);
 
   const { checkLoggedIn, currentUserId } = useContext(AuthContext);
+
+  const searchInputId = useId();
 
   const {
     blogs,
@@ -40,21 +47,27 @@ function Profile() {
     currentPage,
     setCurrentPage,
     fetchBlogs,
-  } = useFetchBlogs(currentUserId || "");
+    totalPages,
+    loading,
+  } = useFetchBlogs({ currentAuthorId: userId });
 
-  const searchInputId = useId();
   const [searchInput, setSearchInput] = useState<string>("");
 
   const isLoggedIn = checkLoggedIn();
 
-  async function fetchCurrentUser() {
+  async function fetchUser() {
+    setProfileLoading((_p) => true);
     userAPI
-      .getUserById(currentUserId!)
+      .getUserById(userId!)
       .then((res) => {
         setCurrentUser(() => res.data);
       })
       .catch((err) => {
         setError(() => (err as AppError).message);
+        navigate("404");
+      })
+      .finally(() => {
+        setProfileLoading((_p) => false);
       });
   }
 
@@ -70,19 +83,28 @@ function Profile() {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
+    fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!isLoggedIn && urlProfileSection === PROFILE_TAB.SECURITY) {
+      navigate(`?section=${PROFILE_TAB.INFO}`);
+      return;
+    }
+    setProfileTab((_p) => urlProfileSection);
+  }, [urlProfileSection, isLoggedIn]);
+
   return (
     <>
-      {!isLoggedIn && <Navigate to="/" replace={true} />}
+      {/* {!isLoggedIn && <Navigate to="/" replace={true} />} */}
       <AnimatePresence>
         {modalOpen && (
           <NameUpdateModal
             setModalOpen={setModalOpen}
             userId={currentUserId!}
-            fetchCurrentUser={fetchCurrentUser}
+            prevName={currentUser!.name}
+            fetchCurrentUser={fetchUser}
           />
         )}
       </AnimatePresence>
@@ -111,27 +133,29 @@ function Profile() {
         <div className="w-full flex justify-center mt-7">
           <div className="w-[90%] md:w-[500px] lg:w-[600px] h-12 text-md md:text-lg bg-gray-100 flex justify-between">
             <div
-              className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.MY_PROFILE ? "border-b-2 border-gray-800" : ""}`}
-              onClick={(_e) => setProfileTab(() => PROFILE_TAB.MY_PROFILE)}
+              className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.INFO ? "border-b-2 border-gray-800" : ""}`}
+              onClick={(_e) => navigate(`?section=${PROFILE_TAB.INFO}`)}
             >
               Profile <IconUser className="inline-block ml-2 text-gray-600" />
             </div>
             <div
               className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.MY_BLOGS ? "border-b-2 border-gray-800" : ""}`}
-              onClick={(_e) => setProfileTab(() => PROFILE_TAB.MY_BLOGS)}
+              onClick={(_e) => navigate(`?section=${PROFILE_TAB.MY_BLOGS}`)}
             >
               Blogs <IconArticle className="inline-block ml-2 text-gray-600" />
             </div>
-            <div
-              className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.SECURITY ? "border-b-2 border-gray-800" : ""}`}
-              onClick={(_e) => setProfileTab(() => PROFILE_TAB.SECURITY)}
-            >
-              Security
-              <IconShieldLock className="inline-block ml-2 text-gray-600" />
-            </div>
+            {isLoggedIn && currentUserId === userId && (
+              <div
+                className={`flex justify-center items-center w-1/2 cursor-pointer hover:bg-gray-200 duration-300 ${profileTab === PROFILE_TAB.SECURITY ? "border-b-2 border-gray-800" : ""}`}
+                onClick={(_e) => navigate(`?section=${PROFILE_TAB.SECURITY}`)}
+              >
+                Security
+                <IconShieldLock className="inline-block ml-2 text-gray-600" />
+              </div>
+            )}
           </div>
         </div>
-        {profileTab === PROFILE_TAB.MY_PROFILE && (
+        {profileTab === PROFILE_TAB.INFO && (
           <motion.div
             className="flex gap-5 justify-center items-center w-full mt-10"
             initial={{ y: 100 }}
@@ -140,24 +164,30 @@ function Profile() {
             <div className="border-r-2 border-gray-700">
               <IconUserFilled className="h-16 w-16 md:w-24 md:h-24" />
             </div>
-            <div className="flex flex-col items-start gap-5">
-              <div className="text-xl md:text-2xl">
-                <span className="font-bold">Username</span>:{" "}
-                {currentUser?.Username}
+            {!profileLoading && currentUser ? (
+              <div className="flex flex-col items-start gap-5">
+                <div className="text-xl md:text-2xl">
+                  <span className="font-bold">Username</span>:{" "}
+                  {currentUser?.username}
+                </div>
+                <div className="text-lg md:text-xl flex items-center gap-2">
+                  <span className="font-bold">Name</span>: {currentUser?.name}{" "}
+                  {isLoggedIn && currentUserId === userId && (
+                    <Tooltip title="edit">
+                      <IconEdit
+                        className="cursor-pointer"
+                        onClick={(_e) => setModalOpen(() => true)}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+                <div className="text-lg md:text-xl">
+                  <span className="font-bold">Email</span>: {currentUser?.email}
+                </div>
               </div>
-              <div className="text-lg md:text-xl flex items-center gap-2">
-                <span className="font-bold">Name</span>: {currentUser?.Name}{" "}
-                <Tooltip title="edit">
-                  <IconEdit
-                    className="cursor-pointer"
-                    onClick={(_e) => setModalOpen(() => true)}
-                  />
-                </Tooltip>
-              </div>
-              <div className="text-lg md:text-xl">
-                <span className="font-bold">Email</span>: {currentUser?.Email}
-              </div>
-            </div>
+            ) : (
+              <ProfileLoader />
+            )}
           </motion.div>
         )}
         {profileTab === PROFILE_TAB.MY_BLOGS && (
@@ -193,45 +223,52 @@ function Profile() {
                   </Button>
                 </div>
               </div>
-              <div className="flex justify-center">
-                <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
-                  {blogs.map((blog) => (
-                    <Blog
-                      key={blog.id}
-                      blog={blog}
-                      currentUserId={currentUserId || ""}
-                      isLoggedIn={isLoggedIn}
-                      setSuccess={setSuccess}
-                      setError={setError}
-                      fetchBlogs={fetchBlogs}
-                    />
-                  ))}
+
+              {loading && (
+                <div className="w-full flex justify-center mt-20">
+                  <CircularProgress color="inherit" />
                 </div>
-                {!blogs.length && (
-                  <span className="text-xl">No blogs found :(</span>
-                )}
-              </div>
-              <div className="w-full border-t border-gray-300 pt-3 flex justify-center items-center gap-3">
-                <Button
-                  color={BUTTON_COLOR.GRAY}
-                  handleClick={(_e) =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                >
-                  &larr;
-                </Button>
-                Page: <strong>{currentPage}</strong>
-                <Button
-                  color={BUTTON_COLOR.GRAY}
-                  handleClick={(_e) => setCurrentPage((prev) => prev + 1)}
-                >
-                  &rarr;
-                </Button>
-              </div>
+              )}
+
+              {!loading && (
+                <>
+                  <div className="flex justify-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-7 lg:grid-flow-row">
+                      {blogs.map((blog) => (
+                        <Blog
+                          key={blog.id}
+                          blog={blog}
+                          currentUserId={currentUserId || ""}
+                          isLoggedIn={isLoggedIn}
+                          setSuccess={setSuccess}
+                          setError={setError}
+                          fetchBlogs={fetchBlogs}
+                        />
+                      ))}
+                    </div>
+                    {!blogs.length && (
+                      <span className="text-xl">No blogs found :(</span>
+                    )}
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <Stack spacing={2}>
+                      <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(_event, value) =>
+                          setCurrentPage((_p) => value)
+                        }
+                      />
+                    </Stack>
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         )}
-        {profileTab === PROFILE_TAB.SECURITY && <PasswordUpdateForm />}
+        {isLoggedIn &&
+          currentUserId === userId &&
+          profileTab === PROFILE_TAB.SECURITY && <PasswordUpdateForm />}
       </div>
     </>
   );

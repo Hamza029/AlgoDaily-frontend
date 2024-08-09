@@ -7,6 +7,7 @@ function Button({
   color,
   rounded = true,
   wide = false,
+  disabled = false,
 }: ButtonProps) {
   let textColor;
   let buttonColor;
@@ -41,7 +42,7 @@ function Button({
   return (
     <>
       <button
-        className={`px-3 py-2 ${rounded ? "rounded-3xl" : "rounded-sm"} ${wide ? "w-full" : ""} font-medium ${textColor} ${buttonColor} ${buttonColorHover} duration-300`}
+        className={`px-3 py-2 ${rounded ? "rounded-3xl" : "rounded-sm"} ${wide ? "w-full" : ""} font-medium ${textColor} ${buttonColor} ${buttonColorHover} ${disabled ? "cursor-not-allowed" : ""} duration-300`}
         onClick={handleClick}
         type="submit"
       >

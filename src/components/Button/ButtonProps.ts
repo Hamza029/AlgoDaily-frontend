@@ -6,4 +6,5 @@ export default interface ButtonProps {
   color: BUTTON_COLOR;
   rounded?: boolean;
   wide?: boolean;
+  disabled?: boolean;
 }

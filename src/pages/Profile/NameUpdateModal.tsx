@@ -8,15 +8,17 @@ import { AppError } from "../../helpers/AppError";
 interface ModalProps {
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   userId: string;
+  prevName: string;
   fetchCurrentUser: () => Promise<void>;
 }
 
 function NameUpdateModal({
   setModalOpen,
   userId,
+  prevName,
   fetchCurrentUser,
 }: ModalProps) {
-  const [nameInput, setNameInput] = useState<string>("");
+  const [nameInput, setNameInput] = useState<string>(prevName);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +63,7 @@ function NameUpdateModal({
             type="text"
             placeholder="Name"
             onChange={handleNameInput}
+            value={nameInput}
             required
           />
           <div>
