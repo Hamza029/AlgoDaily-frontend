@@ -57,6 +57,8 @@ function Blog() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   const isLoggedIn = checkLoggedIn();
 
@@ -165,6 +167,7 @@ function Blog() {
   });
 
   const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
+    setUpdating(true);
     blogAPI
       .updateBlogById(blogId!, data.title, data.description)
       .then((res) => {
@@ -174,13 +177,18 @@ function Blog() {
           title: data.title,
           description: data.description,
         }));
+        toggleEditModal();
       })
       .catch((err) => {
         setError((err as AppError).message);
+      })
+      .finally(() => {
+        setUpdating(false);
       });
   };
 
   const onDelete = () => {
+    setDeleting(true);
     blogAPI
       .deleteBlogById(blogId!)
       .then((_res) => {
@@ -188,6 +196,9 @@ function Blog() {
       })
       .catch((err) => {
         setError((err as AppError).message);
+      })
+      .finally(() => {
+        setDeleting(false);
       });
   };
 
@@ -411,7 +422,9 @@ function Blog() {
                     />
                   </div>
                   <div className="flex justify-center mt-2">
-                    <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
+                    <Button color={BUTTON_COLOR.GREEN} isLoading={updating}>
+                      Update
+                    </Button>
                   </div>
                 </form>
               </Modal>
@@ -437,6 +450,7 @@ function Blog() {
                     rounded={false}
                     wide={true}
                     handleClick={onDelete}
+                    isLoading={deleting}
                   >
                     Delete
                   </Button>
