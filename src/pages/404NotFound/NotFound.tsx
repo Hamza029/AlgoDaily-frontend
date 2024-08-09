@@ -8,7 +8,7 @@ function NotFound() {
   return (
     <div className="flex flex-col gap-3 items-center justify-center h-screen mx-10">
       <div className="text-8xl font-bold">404</div>
-      <img src="./../../../public/404.jpg" className="w-96 md:w-[40rem]" />
+      <img src="./../../../404.jpg" className="w-96 md:w-[40rem]" />
       <div className="text-3xl md:text-4xl font-semibold">
         Looks like you're lost
       </div>
