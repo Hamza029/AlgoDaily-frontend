@@ -21,12 +21,14 @@ function NameUpdateModal({
   const [nameInput, setNameInput] = useState<string>(prevName);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   function handleNameInput(e: React.ChangeEvent<HTMLInputElement>) {
     setNameInput(() => e.target.value);
   }
 
   function handleNameUpdate() {
+    setLoading(true);
     uesrAPI
       .updateUserById(userId, nameInput)
       .then((res) => {
@@ -37,6 +39,9 @@ function NameUpdateModal({
       .catch((err) => {
         setError(() => (err as AppError).message);
         setSuccess(() => null);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 
@@ -67,7 +72,11 @@ function NameUpdateModal({
             required
           />
           <div>
-            <Button color={BUTTON_COLOR.GREEN} handleClick={handleNameUpdate}>
+            <Button
+              color={BUTTON_COLOR.GREEN}
+              handleClick={handleNameUpdate}
+              isLoading={loading}
+            >
               Update
             </Button>
           </div>

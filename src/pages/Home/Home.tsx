@@ -41,6 +41,7 @@ function Home() {
   const [searchInput, setSearchInput] = useState<string>(urlSearch);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [creatingBlog, setCreatingBlog] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const isLoggedIn: boolean = checkLoggedIn();
@@ -84,6 +85,7 @@ function Home() {
   });
 
   const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
+    setCreatingBlog((_p) => true);
     blogAPI
       .createBlog(data.title, data.description)
       .then((res) => {
@@ -94,6 +96,9 @@ function Home() {
       })
       .catch((err) => {
         setError((err as AppError).message);
+      })
+      .finally(() => {
+        setCreatingBlog((_p) => false);
       });
   };
 
@@ -249,7 +254,9 @@ function Home() {
                 />
               </div>
               <div className="flex justify-center mt-2">
-                <Button color={BUTTON_COLOR.GREEN}>Create</Button>
+                <Button color={BUTTON_COLOR.GREEN} isLoading={creatingBlog}>
+                  Create
+                </Button>
               </div>
             </form>
           </Modal>

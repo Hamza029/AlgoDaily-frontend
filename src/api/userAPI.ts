@@ -22,6 +22,7 @@ async function getUserById(userId: string) {
 
 async function updateUserById(userId: string, name: string) {
   try {
+    // await sleep(1000);
     const res = await apiClient.patch(
       `/api/users/${userId}`,
       { name: name },

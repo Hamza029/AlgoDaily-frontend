@@ -21,15 +21,19 @@ function Login() {
 
   const { checkLoggedIn, setToken } = useContext(AuthContext);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<LoginFormFields> = async (data) => {
     try {
+      setLoading((_p) => true);
       const res = await authAPI.login(data);
       const newToken = res.data.token;
       setToken(() => newToken);
     } catch (err) {
       const appError = err as AppError;
       setLoginError(() => appError.message);
+    } finally {
+      setLoading((_p) => false);
     }
   };
 
@@ -73,16 +77,17 @@ function Login() {
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button children="Login" color={BUTTON_COLOR.BLACK} />
+              <Button color={BUTTON_COLOR.BLACK} isLoading={loading}>
+                Login
+              </Button>
             </div>
           </form>
           <div className="flex flex-col justify-center items-center lg:border-l-2 lg:pl-5">
             <p className="mb-3">Don't have an account?</p>
             <Link to={ROUTES.SIGNUP}>
-              <Button
-                children="Create a new account"
-                color={BUTTON_COLOR.GRAY}
-              />
+              <Button color={BUTTON_COLOR.GRAY} disabled={loading}>
+                Create a new account
+              </Button>
             </Link>
           </div>
         </div>

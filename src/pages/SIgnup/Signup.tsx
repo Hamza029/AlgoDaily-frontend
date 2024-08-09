@@ -20,14 +20,18 @@ function Signup() {
 
   const [signupError, setSignupError] = useState<string | null>(null);
   const [singupSuccessful, setSignupSuccessful] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<SignupFormFields> = async (data) => {
     try {
+      setLoading(true);
       const res = await authAPI.signup(data);
       setSignupSuccessful(() => res.message);
     } catch (err) {
       const appError = err as AppError;
       setSignupError(() => appError.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,7 +109,9 @@ function Signup() {
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button children="Signup" color={BUTTON_COLOR.BLACK} />
+              <Button color={BUTTON_COLOR.BLACK} isLoading={loading}>
+                Signup
+              </Button>
             </div>
           </form>
 

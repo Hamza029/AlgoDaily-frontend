@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import { BUTTON_COLOR } from "../../config/constants";
 import ButtonProps from "./ButtonProps";
 
@@ -8,6 +9,7 @@ function Button({
   rounded = true,
   wide = false,
   disabled = false,
+  isLoading = false,
 }: ButtonProps) {
   let textColor;
   let buttonColor;
@@ -42,11 +44,21 @@ function Button({
   return (
     <>
       <button
-        className={`px-3 py-2 ${rounded ? "rounded-3xl" : "rounded-sm"} ${wide ? "w-full" : ""} font-medium ${textColor} ${buttonColor} ${buttonColorHover} ${disabled ? "cursor-not-allowed" : ""} duration-300`}
+        className={`px-3 py-2 relative ${rounded ? "rounded-3xl" : "rounded-sm"} ${wide ? "w-full" : ""} font-medium ${textColor} ${buttonColor} ${buttonColorHover}`}
         onClick={handleClick}
         type="submit"
+        disabled={isLoading || disabled}
       >
-        {children}
+        <div>
+          {children}
+          {isLoading && (
+            <div
+              className={`absolute top-0 left-0 bg-gray-300 ${rounded ? "rounded-3xl" : "rounded-sm"} bg-opacity-50 w-full h-full flex justify-center items-center`}
+            >
+              <CircularProgress size={25} thickness={7} />
+            </div>
+          )}
+        </div>
       </button>
     </>
   );

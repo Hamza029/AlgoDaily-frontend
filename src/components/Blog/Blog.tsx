@@ -43,6 +43,8 @@ function Blog({
     likeCount: blog.likes.length,
     hasLiked: false,
   });
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   const toggleDownloadModal = () => {
     setIsDownloadModalOpen((prev) => !prev);
@@ -69,6 +71,7 @@ function Blog({
   });
 
   const onBlogSubmit: SubmitHandler<BlogFormFields> = (data) => {
+    setUpdating(true);
     blogAPI
       .updateBlogById(blog.id, data.title, data.description)
       .then((res) => {
@@ -77,10 +80,14 @@ function Blog({
       })
       .catch((err) => {
         setError((err as AppError).message);
+      })
+      .finally(() => {
+        setUpdating(false);
       });
   };
 
   const onDelete = () => {
+    setDeleting(true);
     blogAPI
       .deleteBlogById(blog.id)
       .then((res) => {
@@ -89,6 +96,9 @@ function Blog({
       })
       .catch((err) => {
         setError((err as AppError).message);
+      })
+      .finally(() => {
+        setDeleting(false);
       });
   };
 
@@ -278,7 +288,9 @@ function Blog({
                 />
               </div>
               <div className="flex justify-center mt-2">
-                <Button color={BUTTON_COLOR.GREEN}>Submit</Button>
+                <Button color={BUTTON_COLOR.GREEN} isLoading={updating}>
+                  Update
+                </Button>
               </div>
             </form>
           </Modal>
@@ -296,6 +308,7 @@ function Blog({
                 rounded={false}
                 wide={true}
                 handleClick={toggleDeleteModal}
+                disabled={deleting}
               >
                 Cancel
               </Button>
@@ -304,6 +317,7 @@ function Blog({
                 rounded={false}
                 wide={true}
                 handleClick={onDelete}
+                isLoading={deleting}
               >
                 Delete
               </Button>

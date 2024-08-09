@@ -7,4 +7,5 @@ export default interface ButtonProps {
   rounded?: boolean;
   wide?: boolean;
   disabled?: boolean;
+  isLoading?: boolean;
 }

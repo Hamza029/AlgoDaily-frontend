@@ -40,9 +40,11 @@ function PasswordUpdateForm() {
   const [passwordUpdateSuccess, setPasswordUpdateSuccess] = useState<
     string | null
   >(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<PassworUpdateFormFileds> = async (data) => {
     try {
+      setLoading(true);
       const res = await authAPI.updateMyPassword(
         data.currentPassword,
         data.newPassword,
@@ -51,6 +53,8 @@ function PasswordUpdateForm() {
     } catch (err) {
       const appError = err as AppError;
       setPasswordUpdateError(() => appError.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,7 +120,9 @@ function PasswordUpdateForm() {
             </div>
 
             <div className="flex justify-center mb-7">
-              <Button color={BUTTON_COLOR.GREEN}>Update Password</Button>
+              <Button color={BUTTON_COLOR.GREEN} isLoading={loading}>
+                Update Password
+              </Button>
             </div>
           </form>
         </div>

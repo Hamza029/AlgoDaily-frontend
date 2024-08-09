@@ -6,8 +6,13 @@ import { SignupFormFields } from "../pages/SIgnup/SignupSchema";
 import { LoginResponse } from "../shared/types";
 import { AppError } from "../helpers/AppError";
 
+// const sleep = (ms: number) => {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// };
+
 async function login(loginInputs: LoginFormFields) {
   try {
+    // await sleep(1000);
     const res = await apiClient.post("/api/auth/login", {
       username: loginInputs.username,
       password: loginInputs.password,
@@ -22,6 +27,7 @@ async function login(loginInputs: LoginFormFields) {
 
 async function signup(inputs: SignupFormFields) {
   try {
+    // await sleep(1000);
     const res = await apiClient.post("/api/auth/signup", {
       username: inputs.username,
       email: inputs.email,
@@ -39,7 +45,7 @@ async function signup(inputs: SignupFormFields) {
 
 async function updateMyPassword(currentPassword: string, newPassword: string) {
   try {
-    console.log(currentPassword, newPassword);
+    // await sleep(1000);
     const res = await apiClient.patch(
       "/api/auth/password",
       {

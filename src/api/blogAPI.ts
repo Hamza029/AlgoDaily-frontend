@@ -66,6 +66,7 @@ async function getBlogAsXMLById(blogId: string) {
 
 async function createBlog(title: string, description: string) {
   try {
+    // await sleep(3000);
     const res = await apiClient.post(
       "api/blogs",
       { title: title, description: description },
@@ -80,6 +81,7 @@ async function createBlog(title: string, description: string) {
 
 async function updateBlogById(id: string, title: string, description: string) {
   try {
+    // await sleep(1000);
     const res = await apiClient.patch(
       `api/blogs/${id}`,
       { title, description },
@@ -94,6 +96,7 @@ async function updateBlogById(id: string, title: string, description: string) {
 
 async function deleteBlogById(id: string) {
   try {
+    // await sleep(1000);
     const res = await apiClient.delete(`api/blogs/${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
