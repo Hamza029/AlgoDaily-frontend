@@ -49,7 +49,6 @@ function useFetchBlogs({
       .then((res) => {
         setBlogs(() => res.data.blogs);
         setTotalPages(() => res.data.totalPages);
-        setErrorMessage(() => null);
       })
       .catch((err) => {
         setErrorMessage(() => (err as AppError).message);
@@ -57,7 +56,7 @@ function useFetchBlogs({
       .finally(() => {
         setLoading((_p) => false);
       });
-  }, [currentPage, filterType, searchText, authorId, fetchBlogs]);
+  }, [currentPage, filterType, searchText, authorId]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

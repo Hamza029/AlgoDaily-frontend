@@ -1,5 +1,5 @@
 import { useContext, useEffect, useId, useState } from "react";
-import { BUTTON_COLOR, PROFILE_TAB, ROUTES } from "../../config/constants";
+import { BUTTON_COLOR, PROFILE_TAB } from "../../config/constants";
 import { Blog, Button, ProfileLoader, Toast } from "../../components";
 import {
   IconSearch,
@@ -164,7 +164,7 @@ function Profile() {
             <div className="border-r-2 border-gray-700">
               <IconUserFilled className="h-16 w-16 md:w-24 md:h-24" />
             </div>
-            {currentUser ? (
+            {!profileLoading && currentUser ? (
               <div className="flex flex-col items-start gap-5">
                 <div className="text-xl md:text-2xl">
                   <span className="font-bold">Username</span>:{" "}

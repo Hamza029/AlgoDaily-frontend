@@ -3,7 +3,7 @@ import env from "../config/env";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: env.SERVER_URL,
-  timeout: 5000,
+  timeout: 10000,
   headers: {
     Accept: "application/json",
   },
