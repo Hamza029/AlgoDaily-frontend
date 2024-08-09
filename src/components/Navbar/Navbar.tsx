@@ -22,7 +22,6 @@ function Navbar({ isAuthPage }: NavbarProps) {
   const Logout = () => {
     setProfileDropdown(() => false);
     setToken(() => null);
-    window.location.reload();
   };
 
   return (
