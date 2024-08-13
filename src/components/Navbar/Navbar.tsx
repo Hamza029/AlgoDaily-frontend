@@ -54,7 +54,7 @@ function Navbar({ isAuthPage }: NavbarProps) {
               <AnimatePresence>
                 {profileDropdown && (
                   <motion.div
-                    className="h-24 w-32 flex flex-col justify-center bg-gray-100 rounded-lg shadow-2xl border-2 border-gray-700 absolute top-14 right-0"
+                    className="h-24 w-32 flex flex-col justify-center bg-gray-100 rounded-lg shadow-2xl border-2 border-gray-700 absolute top-14 right-0 z-10"
                     initial={{ y: -15, scaleY: 0, opacity: 0 }}
                     animate={{ y: 0, scaleY: 1, opacity: 100 }}
                     exit={{ y: -15, scaleY: 0, opacity: 0 }}

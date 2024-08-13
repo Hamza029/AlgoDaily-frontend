@@ -50,7 +50,7 @@ function Home() {
     setCurrentPage(urlPage);
     setSearchInput(urlSearch);
     setSearchText(urlSearch);
-    fetchBlogs();
+    // fetchBlogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlPage, urlSearch]);
 
