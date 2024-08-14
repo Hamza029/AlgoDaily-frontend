@@ -13,6 +13,6 @@ RUN npm run build
 # for serving static files
 RUN npm i -g serve
 
-EXPOSE 3000
+EXPOSE 5173
 
-CMD ["serve", "-s", "dist"]
+CMD ["serve", "-l", "5173", "-s", "dist"]

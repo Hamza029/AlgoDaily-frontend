@@ -1,3 +1,3 @@
 export default {
-  SERVER_URL: process.env.REACT_APP_BASE_URL || "http://localhost:300",
+  SERVER_URL: import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:3000",
 };
