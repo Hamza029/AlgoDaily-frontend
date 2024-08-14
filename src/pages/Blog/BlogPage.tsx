@@ -3,6 +3,7 @@ import {
   BlogFormFields,
   BlogResponse,
   blogValidationSchema,
+  CommentInfo,
 } from "../../shared/types";
 import { useContext, useEffect, useState } from "react";
 import blogAPI from "../../api/blogAPI";
@@ -18,20 +19,21 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { AppError } from "../../helpers/AppError";
-import { Button, JoinNowPrompt, Modal, Toast } from "../../components";
+import {
+  Button,
+  CommentsLoader,
+  JoinNowPrompt,
+  Modal,
+  Toast,
+} from "../../components";
 import { BUTTON_COLOR, CONTENT_TYPE } from "../../config/constants";
 import userAPI from "../../api/userAPI";
 import { CodeXml, FileJson, FileText } from "lucide-react";
 import { downloadBlog, formatDate, timeAgo } from "../../helpers/utils";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-
-interface CommentInfo {
-  userId: string;
-  content: string;
-  username: string;
-  createdAt: Date;
-}
+import useFetchComments from "../../hooks/useFetchComments";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function Blog() {
   const { blogId } = useParams();
@@ -45,7 +47,13 @@ function Blog() {
     likeCount: 0,
     hasLiked: false,
   });
-  const [comments, setComments] = useState<CommentInfo[]>([]);
+  const {
+    comments,
+    setComments,
+    totalComments,
+    setTotalComments,
+    fetchMoreComments,
+  } = useFetchComments({ blogId: blogId! });
   const [newComment, setNewComment] = useState<string>("");
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] =
@@ -76,7 +84,7 @@ function Blog() {
         }
         setBlog(() => res.data);
         setLikeState((prev) => ({ ...prev, likeCount: res.data.likes.length }));
-        setComments(res.data.comments);
+        // setComments(res.data.comments);
       })
       .catch((_err) => {
         navigate("404");
@@ -137,6 +145,7 @@ function Blog() {
           content: newComment,
         };
         setComments((prev) => [currentComment, ...prev]);
+        setTotalComments((prev) => prev + 1);
         setNewComment("");
       } catch (err) {
         setError((err as AppError).message);
@@ -267,7 +276,7 @@ function Blog() {
                 <Tooltip title="comments">
                   <div className="">
                     <IconMessageCircle className="inline-block cursor-pointer" />{" "}
-                    {comments.length}
+                    {totalComments}
                   </div>
                 </Tooltip>
                 <Tooltip title="download">
@@ -328,30 +337,40 @@ function Blog() {
               {comments.length > 0 && (
                 <div className="text-2xl w-full font-semibold">Comments:</div>
               )}
-              <div id="comments-section" className="flex flex-col gap-3 w-full">
-                {comments.map((comment, index) => (
-                  <div
-                    key={index}
-                    className="flex gap-2 w-full border-b-2 pb-3"
-                  >
-                    <div className="font-semibold">
-                      <Link
-                        to={`/profile/${comment.userId}`}
-                        className="hover:underline"
-                      >
-                        {comment.username}
-                      </Link>
-                      :
-                    </div>
-                    <div className="text-gray-500 ml-3">
-                      <div>{comment.content}</div>
-                      <div className="text-sm mt-2 text-gray-700">
-                        {timeAgo(comment.createdAt)}
+              <InfiniteScroll
+                dataLength={comments.length}
+                next={fetchMoreComments}
+                hasMore={comments.length < totalComments}
+                loader={<CommentsLoader />}
+              >
+                <div
+                  id="comments-section"
+                  className="flex flex-col gap-3 w-full"
+                >
+                  {comments.map((comment, index) => (
+                    <div
+                      key={index}
+                      className="flex gap-2 w-full border-b-2 pb-3"
+                    >
+                      <div className="text-gray-500 ml-3">
+                        <div className="font-semibold text-gray-700">
+                          <Link
+                            to={`/profile/${comment.userId}`}
+                            className="hover:underline"
+                          >
+                            {comment.username}
+                          </Link>
+                          :
+                        </div>
+                        <div>{comment.content}</div>
+                        <div className="text-sm mt-2 text-gray-700">
+                          {timeAgo(comment.createdAt)}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </InfiniteScroll>
             </div>
           </div>
           <AnimatePresence>

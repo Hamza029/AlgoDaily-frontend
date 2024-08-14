@@ -14,6 +14,11 @@ export interface CommentResponse {
   createdAt: Date;
 }
 
+export interface CommentResponseList {
+  totalComments: number;
+  comments: CommentResponse[];
+}
+
 export default interface BlogResponse {
   id: string;
   authorId: string;
@@ -22,7 +27,7 @@ export default interface BlogResponse {
   authorUsername: string;
   createdAt: Date;
   likes: LikeResponse[];
-  comments: CommentResponse[];
+  commentsCount: number;
 }
 
 export interface BlogResponseList {

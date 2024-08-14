@@ -1,13 +1,17 @@
 import apiClient from "./apiClient";
-import { BlogResponse, BlogResponseList } from "../shared/types";
+import {
+  BlogResponse,
+  BlogResponseList,
+  CommentResponseList,
+} from "../shared/types";
 import { AxiosError } from "axios";
 import { AppError } from "../helpers/AppError";
 import { parseResponse, parseError } from "../helpers/utils";
 import { CONTENT_TYPE, HTTPStatusCode } from "../config/constants";
 
-// const sleep = (ms: number) => {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// };
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 async function getAllBlogs(page: number, searchText: string, authorId: string) {
   try {
@@ -25,7 +29,7 @@ async function getAllBlogs(page: number, searchText: string, authorId: string) {
 
 async function getBlogById(blogId: string) {
   try {
-    // await sleep(500);
+    await sleep(500);
     const res = await apiClient.get(`/api/blogs/${blogId}`);
     return parseResponse<BlogResponse>(res);
   } catch (err) {
@@ -135,11 +139,28 @@ async function unlikeBlogByBlogId(blogId: string) {
   }
 }
 
+async function getCommentsByBlogId(
+  blogId: string,
+  skip: number,
+  limit: number,
+) {
+  try {
+    await sleep(1500);
+    const res = await apiClient.get(
+      `api/blogs/${blogId}/comments?skip=${skip}&limit=${limit}`,
+    );
+    return parseResponse<CommentResponseList>(res);
+  } catch (err) {
+    const errResponse = parseError(err as AxiosError);
+    throw new AppError(errResponse.message, errResponse.status);
+  }
+}
+
 async function createComment(blogId: string, content: string) {
   try {
-    // await sleep(500);
+    await sleep(500);
     const res = await apiClient.post(
-      `api/blogs/${blogId}/comment`,
+      `api/blogs/${blogId}/comments`,
       { content: content },
       {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -163,4 +184,5 @@ export default {
   likeBlogByBlogId,
   unlikeBlogByBlogId,
   createComment,
+  getCommentsByBlogId,
 };

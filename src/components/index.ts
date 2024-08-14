@@ -7,6 +7,7 @@ import FilterBar from "./Filter/FilterBar";
 import Modal from "./Modal/Modal";
 import ProfileLoader from "./Loader/ProfileLoader";
 import JoinNowPrompt from "./JoinNowPrompt/JoinNowPrompt";
+import CommentsLoader from "./Loader/CommentsLoader";
 
 export {
   Navbar,
@@ -18,4 +19,5 @@ export {
   Modal,
   ProfileLoader,
   JoinNowPrompt,
+  CommentsLoader,
 };

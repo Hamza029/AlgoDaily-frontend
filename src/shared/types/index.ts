@@ -1,7 +1,11 @@
+import { CommentInfo } from "./CommentInfo";
 import APIResponse from "./apiRespose";
 import JWTPayload from "./jwtPayload";
 import LoginResponse from "./loginResponse";
-import BlogResponse from "./blogResponse";
+import BlogResponse, {
+  CommentResponse,
+  CommentResponseList,
+} from "./blogResponse";
 import UserResponse from "./userResponse";
 import { BlogFormFields } from "./blogEditSchema";
 import { BlogResponseList } from "./blogResponse";
@@ -16,4 +20,7 @@ export type {
   UserResponse,
   BlogFormFields,
   BlogResponseList,
+  CommentResponseList,
+  CommentResponse,
+  CommentInfo,
 };

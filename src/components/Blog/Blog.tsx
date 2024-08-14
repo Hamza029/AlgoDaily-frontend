@@ -147,7 +147,7 @@ function Blog({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-3 p-7 w-80 md:w-[500px] lg:w-[480px] shadow-lg rounded-lg border-2 border-gray-50">
+      <div className="flex flex-col items-start justify-between gap-3 p-7 w-80 md:w-[500px] lg:w-[480px] shadow-lg rounded-lg border-2 border-gray-50">
         <div className="text-2xl text-gray-800 font-semibold max-w-64 md:max-w-[420px] overflow-hidden text-wrap line-clamp-2">
           <Link
             to={`/blog/${blog.id}`}
@@ -192,7 +192,7 @@ function Blog({
             <div className="">
               <Link to={`/blog/${blog.id}`}>
                 <IconMessageCircle className="inline-block cursor-pointer" />{" "}
-                {blog.comments.length}
+                {blog.commentsCount}
               </Link>
             </div>
           </Tooltip>

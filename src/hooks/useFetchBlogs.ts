@@ -4,7 +4,7 @@ import { AppError } from "../helpers/AppError";
 import { BlogResponse } from "../shared/types";
 import { FILTER_TYPE } from "../config/constants";
 
-interface IUserFetchBlogs {
+interface IUseFetchBlogs {
   currentAuthorId?: string | null;
   pageNumber?: number | null;
   blogSearchText?: string | null;
@@ -14,7 +14,7 @@ function useFetchBlogs({
   currentAuthorId,
   pageNumber,
   blogSearchText,
-}: IUserFetchBlogs) {
+}: IUseFetchBlogs) {
   const [currentPage, setCurrentPage] = useState(pageNumber || 1);
   const [blogs, setBlogs] = useState<BlogResponse[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
