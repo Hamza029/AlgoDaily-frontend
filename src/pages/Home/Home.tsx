@@ -92,7 +92,8 @@ function Home() {
         setSuccess(res.message);
         reset();
         toggleModal();
-        navigate(`?page=1${urlSearch ? `&search=${urlSearch}` : ""}`);
+        navigate("");
+        fetchBlogs();
       })
       .catch((err) => {
         setError((err as AppError).message);
